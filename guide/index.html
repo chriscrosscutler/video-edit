@@ -1,0 +1,1711 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>video-edit Field Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Archivo:wdth,wght@62..125,400..800&family=Bebas+Neue&family=Caveat:wght@700&family=DM+Sans:wght@700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@600&family=Playfair+Display:wght@700&family=Rubik:wght@700&family=TikTok+Sans:wght@500;700&family=Instrument+Serif:ital@0;1&family=DM+Serif+Display&family=Fraunces:opsz,wght@9..144,600&family=Bodoni+Moda:opsz,wght@6..96,700&family=Cormorant+Garamond:wght@600&family=Gloock&family=Italiana&family=Syne:wght@800&family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Space+Grotesk:wght@700&family=Unbounded:wght@800&family=Great+Vibes&display=swap">
+<style>
+/* Layout: a field manual. A sticky chip index, then sections that pair a live 9:16 demo with the numbers behind it. */
+:root {
+  --bg: #EEF0F3; --panel: #FFFFFF; --ink: #121419; --muted: #596071; --line: #D5D9E1;
+  --accent: #2457F5; --accent-ink: #FFFFFF; --soft: #E2E8F7; --warn: #C8372D; --ok: #1E7F55; --code: #E6E9EF;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  /* footage: video frames look the same in either theme */
+  --wall-1: #D2C0AD; --wall-2: #9C8775; --window: #F6EDE0; --skin: #C78D6E; --skin-2: #A97056;
+  --hair: #2E211B; --shirt: #5E7290; --shirt-2: #485A76; --bright-1: #FBFAF7; --bright-2: #E9E4DB;
+  --prod-1: #2F7073; --prod-2: #173E42; --jar: #F2E5D3; --lid: #D7A13E; --leak-1: #FFB25C; --leak-2: #FF5E7A;
+  --cap: #FFFFFF; --pop: #FFD60A; --stroke: #000000; --dip-black: #000000; --dip-white: #FFFFFF;
+  --zone: #3D6BFF; --scrim: #000000; --check-1: #8C919B; --check-2: #A7ABB3; --z-tiktok: #FF3B6B; --z-reels: #F5A623; --z-shorts: #22B8CF;
+  --z-stories: #A259FF; --z-pin: #E60023; --z-grid: #12B886;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1014; --panel: #161920; --ink: #E8EAF0; --muted: #9BA2B3; --line: #282D37;
+    --accent: #7398FF; --accent-ink: #0E1014; --soft: #1C2436; --warn: #FF7A70; --ok: #4CC38E; --code: #1C2029;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1014; --panel: #161920; --ink: #E8EAF0; --muted: #9BA2B3; --line: #282D37;
+  --accent: #7398FF; --accent-ink: #0E1014; --soft: #1C2436; --warn: #FF7A70; --ok: #4CC38E; --code: #1C2029;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 1120px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.12; }
+h1 { font-size: clamp(2.1rem, 5vw, 3.4rem); font-weight: 800; font-variation-settings: "wdth" 118; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; font-variation-settings: "wdth" 112; }
+h3 { font-size: 1.08rem; font-weight: 700; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--mono); font-size: 0.88em; }
+code { background: var(--code); padding: 0.08em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+.muted { color: var(--muted); }
+.eyebrow { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent); font-weight: 500; }
+
+/* header + index */
+header.hero { padding-block: 48px 28px; display: grid; gap: 18px; }
+.hero .lede { font-size: 1.12rem; color: var(--muted); }
+nav.index {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9; background: var(--bg);
+  border-bottom: 1px solid var(--line); margin-inline: -4px; padding-block: 10px;
+}
+nav.index .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-inline: 4px; align-items: center; }
+nav.index .chips::-webkit-scrollbar { display: none; }
+nav.index a, .btn {
+  flex: none; font-size: 0.84rem; text-decoration: none; color: var(--ink); border: 1px solid var(--line);
+  background: var(--panel); padding: 5px 11px; border-radius: 999px; white-space: nowrap; font-family: var(--body); cursor: pointer;
+}
+nav.index a:hover, .btn:hover { border-color: var(--accent); }
+.btn { line-height: 1.4; }
+.btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+section { padding-block: 56px 8px; display: grid; gap: 22px; scroll-margin-top: 64px; }
+.sec-head { display: grid; gap: 8px; }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--min, 260px)), 1fr)); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.panel p { font-size: 0.93rem; }
+.tag { display: inline-block; justify-self: start; width: max-content; max-width: 100%; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; background: var(--soft); color: var(--accent); }
+.tag.warn { background: transparent; border: 1px solid var(--warn); color: var(--warn); }
+.tag.ok { background: transparent; border: 1px solid var(--ok); color: var(--ok); }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+/* tables and code */
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 500; }
+tr:last-child td { border-bottom: 0; }
+td.num, .num { font-variant-numeric: tabular-nums; }
+.codebox { position: relative; min-width: 0; }
+pre { margin: 0; background: var(--code); border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-family: var(--mono); font-size: 0.8rem; line-height: 1.6; }
+.copy { position: absolute; top: 8px; right: 8px; font-size: 0.72rem; padding: 3px 9px; }
+
+/* spec sheet */
+dl.spec { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 0.9rem; }
+dl.spec dt { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 500; white-space: nowrap; }
+dl.spec dd { margin: 0; color: var(--muted); min-width: 0; }
+
+/* 9:16 frames */
+.frame {
+  position: relative; width: var(--w, 200px); max-width: 100%; aspect-ratio: 9 / 16; border-radius: 14px; overflow: hidden;
+  container-type: inline-size; background: var(--wall-2); box-shadow: 0 0 0 1px var(--line); flex: none; isolation: isolate;
+}
+.frame > svg, .frame .layer { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.frame img.layer { object-fit: cover; }
+.title-svg { filter: drop-shadow(0 0.4cqw 1.4cqw rgb(0 0 0 / 0.45)); }
+.demo-row { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); align-items: start; }
+.demo-row .frame { --w: 100%; }
+.demo-row figcaption { max-width: none; }
+.demo { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.demo figcaption { font-size: 0.86rem; display: grid; gap: 2px; max-width: var(--w, 200px); }
+.demo figcaption b { font-weight: 700; }
+figure { margin: 0; }
+
+/* text on footage, sized as a fraction of a 1080-wide frame */
+.cap { position: absolute; left: 11%; right: 11%; text-align: center; color: var(--cap); line-height: 1.15; }
+.cap.low { bottom: 27%; }
+.cap.high { top: 15%; }
+.t-calm { font-family: "TikTok Sans", var(--body); font-weight: 700; font-size: 7cqw; text-shadow: 0 0.35cqw 1.4cqw rgb(0 0 0 / 0.55); text-transform: lowercase; }
+.t-clean { font-family: "Inter", var(--body); font-weight: 600; font-size: 7cqw; text-shadow: 0 0.35cqw 1.4cqw rgb(0 0 0 / 0.55); }
+.t-bold { font-family: "Archivo Black", var(--body); font-size: 7.6cqw; -webkit-text-stroke: 0.14em var(--stroke); paint-order: stroke fill; }
+.t-boxed { font-family: "DM Sans", var(--body); font-weight: 700; font-size: 7cqw; }
+.t-boxed span { background: rgb(0 0 0 / 0.72); border-radius: 1.7cqw; padding: 0.6cqw 2.4cqw; box-decoration-break: clone; -webkit-box-decoration-break: clone; line-height: 1.5; }
+.t-pop { font-family: "Anton", var(--body); font-size: 8.4cqw; letter-spacing: 0.01em; -webkit-text-stroke: 0.14em var(--stroke); paint-order: stroke fill; text-transform: uppercase; }
+.t-pop span { animation: popw 2.5s infinite steps(1, end); }
+.t-pop span:nth-child(2) { animation-delay: 0.5s; } .t-pop span:nth-child(3) { animation-delay: 1s; }
+.t-pop span:nth-child(4) { animation-delay: 1.5s; } .t-pop span:nth-child(5) { animation-delay: 2s; }
+@keyframes popw { 0% { color: var(--pop); } 20%, 100% { color: var(--cap); } }
+.t-box-fix span { background: rgb(0 0 0 / 0.42); border-radius: 1.7cqw; padding: 0.4cqw 2cqw; box-decoration-break: clone; -webkit-box-decoration-break: clone; line-height: 1.5; text-shadow: none; }
+
+/* fonts */
+.font-card { padding: 0; overflow: hidden; gap: 0; }
+.font-card .sample {
+  background: linear-gradient(160deg, var(--wall-2), var(--hair)); color: var(--cap); min-height: 132px;
+  display: grid; place-items: center; padding: 18px 16px; text-align: center; font-size: 2rem; line-height: 1.1;
+  text-shadow: 0 2px 8px rgb(0 0 0 / 0.5);
+}
+.font-card .meta { padding: 14px 16px 16px; display: grid; gap: 8px; }
+.font-card .glyphs { font-size: 1.25rem; line-height: 1.2; overflow-wrap: anywhere; }
+.font-card .head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+
+/* animations */
+.a-calm .cap { animation: calm 3.6s infinite; }
+@keyframes calm {
+  0% { opacity: 0; transform: translateY(1.2cqw); animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+  8.3% { opacity: 1; transform: none; }
+  80% { opacity: 1; transform: none; animation-timing-function: ease-in; }
+  84.7%, 100% { opacity: 0; transform: none; }
+}
+.a-stagger .cap span { display: inline-block; animation: calm 3.6s infinite; }
+.a-stagger .cap span:nth-child(2) { animation-delay: 0.1s; } .a-stagger .cap span:nth-child(3) { animation-delay: 0.2s; }
+.a-stagger .cap span:nth-child(4) { animation-delay: 0.3s; } .a-stagger .cap span:nth-child(5) { animation-delay: 0.4s; }
+.logo-badge {
+  position: absolute; left: 50%; top: 44%; width: 46%; translate: -50% 0; aspect-ratio: 2.4; border-radius: 3cqw;
+  background: var(--jar); color: var(--prod-2); display: grid; place-items: center; font-family: "Playfair Display", serif;
+  font-weight: 700; font-size: 8cqw; box-shadow: 0 1cqw 4cqw rgb(0 0 0 / 0.3); animation: logo 3.6s infinite;
+}
+@keyframes logo {
+  0%, 20% { opacity: 0; transform: scale(0.94); animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+  27% { opacity: 1; transform: scale(1); } 80% { opacity: 1; transform: scale(1); } 85%, 100% { opacity: 0; transform: scale(1); }
+}
+.a-kb > svg { animation: kb 3.6s infinite alternate linear; transform-origin: 50% 42%; }
+@keyframes kb { from { transform: scale(1); } to { transform: scale(1.06); } }
+.a-good .cap, .a-bad .cap { animation-duration: 2.4s; animation-iteration-count: infinite; }
+.a-good .cap { animation-name: settle; }
+.a-bad .cap { animation-name: bounce; }
+@keyframes settle { 0% { opacity: 0; transform: translateY(5cqw); animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); } 25%, 100% { opacity: 1; transform: none; } }
+@keyframes bounce {
+  0% { opacity: 0; transform: scale(0.5); } 12% { opacity: 1; transform: scale(1.16); } 19% { transform: scale(0.93); }
+  25% { transform: scale(1.04); } 30%, 100% { opacity: 1; transform: scale(1); }
+}
+.a-phrase .cap { opacity: 0; animation: phrase 3.6s infinite; }
+.a-phrase .cap:nth-of-type(2) { animation-delay: 1.2s; } .a-phrase .cap:nth-of-type(3) { animation-delay: 2.4s; }
+@keyframes phrase { 0% { opacity: 0; } 3.5%, 30% { opacity: 1; } 33.3%, 100% { opacity: 0; } }
+
+/* text behind a person */
+.tbh { display: grid; gap: 24px; grid-template-columns: minmax(0, auto) minmax(0, 1fr); align-items: start; }
+.tbh > .frame { --w: 320px; }
+.stack-mini { display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+.stack-mini figure { display: grid; gap: 6px; justify-items: center; }
+.stack-mini .frame { --w: 72px; border-radius: 8px; }
+.stack-mini figcaption { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); text-align: center; max-width: 88px; line-height: 1.3; }
+.stack-mini .op { font-family: var(--mono); color: var(--muted); font-size: 1.1rem; padding-top: 52px; }
+.frame.checker { background: repeating-conic-gradient(var(--check-1) 0 25%, var(--check-2) 0 50%) 0 0 / 10px 10px; }
+@media (max-width: 720px) { .tbh { grid-template-columns: minmax(0, 1fr); } }
+
+/* transitions */
+.tr-grid { --min: 290px; }
+.tr { display: flex; gap: 14px; align-items: flex-start; }
+.tr .frame { --w: 108px; border-radius: 10px; }
+.tr .info { display: grid; gap: 4px; min-width: 0; font-size: 0.86rem; }
+.tr .info .k { font-family: var(--mono); font-size: 0.76rem; color: var(--muted); overflow-wrap: anywhere; }
+.tr .layer { will-change: transform, opacity; }
+.tr .A, .tr .B, .tr .X { animation-duration: 2.4s; animation-iteration-count: infinite; animation-direction: alternate; animation-timing-function: ease-in-out; }
+.tr .X { background: var(--dip-black); opacity: 0; }
+.tr-cut .B { animation-name: cutB; } .tr-fade .B { animation-name: fadeB; }
+.tr-dipb .B, .tr-dipw .B { animation-name: cutB; } .tr-dipb .X, .tr-dipw .X { animation-name: dip; } .tr-dipw .X { background: var(--dip-white); }
+.tr-push .A { animation-name: pushA; } .tr-push .B { animation-name: pushB; }
+.tr-cover .B { animation-name: pushB; }
+.tr-wipe .B { animation-name: wipeB; }
+.tr-circle .B { animation-name: circleB; }
+.tr-zoom .A { animation-name: zoomA; z-index: 2; }
+.tr-leak .B { animation-name: cutB; } .tr-leak .X { background: radial-gradient(circle at 70% 30%, var(--leak-1), var(--leak-2) 45%, transparent 75%); animation-name: dip; }
+@keyframes cutB { 0%, 49.9% { opacity: 0; } 50%, 100% { opacity: 1; } }
+@keyframes fadeB { 0%, 36% { opacity: 0; } 64%, 100% { opacity: 1; } }
+@keyframes dip { 0%, 36% { opacity: 0; } 50% { opacity: 1; } 64%, 100% { opacity: 0; } }
+@keyframes pushA { 0%, 38% { transform: translateX(0); } 62%, 100% { transform: translateX(-100%); } }
+@keyframes pushB { 0%, 38% { transform: translateX(100%); } 62%, 100% { transform: translateX(0); } }
+@keyframes wipeB { 0%, 38% { clip-path: inset(0 0 0 100%); } 62%, 100% { clip-path: inset(0 0 0 0); } }
+@keyframes circleB { 0%, 38% { clip-path: circle(0% at 50% 50%); } 62%, 100% { clip-path: circle(75% at 50% 50%); } }
+@keyframes zoomA { 0%, 38% { transform: scale(1); opacity: 1; } 62%, 100% { transform: scale(1.8); opacity: 0; } }
+.chips-list { display: flex; flex-wrap: wrap; gap: 5px; }
+.chips-list code { font-size: 0.76rem; }
+details { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; }
+details > summary { cursor: pointer; font-weight: 700; }
+details[open] > summary { margin-bottom: 12px; }
+
+/* safe zones: phone UI drawn at 1080 by 1920 over the footage */
+.zones { display: grid; gap: 22px 18px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); align-items: start; }
+.zone-fig { display: grid; gap: 10px; min-width: 0; }
+.zone-fig svg { width: 100%; max-width: 320px; height: auto; display: block; }
+.legend { display: grid; gap: 5px; font-size: 0.84rem; }
+.legend span.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 8px; vertical-align: -1px; }
+.ui { color: #FFFFFF; fill: #FFFFFF; filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.5)); font-family: "TikTok Sans", var(--body); }
+.ui .dim { opacity: 0.72; }
+.ui .navbar { fill: #000000; filter: none; }
+.sample-txt { font-family: "TikTok Sans", var(--body); font-weight: 700; fill: #FFFFFF; filter: drop-shadow(0 3px 8px rgb(0 0 0 / 0.6)); }
+.zones.hide-ui .ui, .zones.hide-box .box, .zones.hide-sample .sample-txt { display: none; }
+
+/* set pieces and grades */
+.fx-row { --min: 220px; }
+.fx-row .frame, .grade .frame { --w: 100%; }
+.fx-row figcaption, .grade figcaption { max-width: none; }
+.fx-row figcaption code { justify-self: start; font-size: 0.74rem; }
+.grade .frame { cursor: pointer; }
+.grade .frame img.top { transition: opacity 0.2s; }
+.grade .frame:hover img.top, .grade .frame:active img.top { opacity: 0; }
+.grade figcaption code { font-size: 0.7rem; }
+.font-card.display .sample {
+  background: linear-gradient(rgb(0 0 0 / 0.38), rgb(0 0 0 / 0.38)), url(img/baker.webp) center 28% / cover;
+  min-height: 150px; font-size: 2.3rem;
+}
+
+/* workflow */
+ol.flow { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: step; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow: hidden; }
+ol.flow li { counter-increment: step; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 4px 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+ol.flow li:last-child { border-bottom: 0; }
+ol.flow li::before { content: counter(step); font-family: var(--mono); font-weight: 500; color: var(--accent); font-size: 1.1rem; grid-row: span 2; }
+ol.flow b { font-weight: 700; }
+ol.flow .k { font-size: 0.86rem; color: var(--muted); }
+ul.plain { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; font-size: 0.93rem; }
+
+.paused .demo-area *, .paused .demo-area { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: reduce) {
+  .demo-area *, .demo-area { animation-delay: -1.4s !important; animation-play-state: paused !important; }
+}
+@media (max-width: 520px) { body { font-size: 15px; } .tr .frame { --w: 92px; } .demo-row { grid-template-columns: 1fr 1fr; gap: 12px; } .demo-row > .panel { grid-column: 1 / -1; } }
+
+/* diagrams, step lists */
+.diagram { width: 100%; max-width: 560px; height: auto; display: block; }
+.diagram text { font-family: var(--mono); font-size: 13px; fill: var(--muted); }
+.diagram .lbl { fill: var(--ink); font-weight: 500; }
+.diagram .axis { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+.diagram .guide { stroke: var(--line); stroke-width: 1.5; fill: none; stroke-dasharray: 3 5; }
+.diagram .curve { stroke: var(--accent); stroke-width: 3; fill: none; stroke-linejoin: round; }
+.diagram .area { fill: var(--soft); }
+.diagram .pic { fill: var(--accent); fill-opacity: 0.18; stroke: var(--accent); stroke-width: 1.5; }
+.diagram .snd { fill: var(--ok); fill-opacity: 0.18; stroke: var(--ok); stroke-width: 1.5; }
+.diagram .mark { stroke: var(--warn); stroke-width: 2; stroke-dasharray: 5 4; }
+.diagram .wave { fill: var(--ok); fill-opacity: 0.3; stroke: var(--ok); stroke-width: 1.5; }
+.diagram .noise { stroke: var(--muted); stroke-width: 1.2; fill: none; }
+.diagram .flat { stroke: var(--warn); stroke-width: 2.5; }
+ol.steps { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; font-size: 0.93rem; }
+td code { font-size: 0.8em; }
+dl.spec.wrap dt { white-space: normal; max-width: 11em; }
+@media (max-width: 520px) { dl.spec.wrap { grid-template-columns: 1fr; gap: 2px; } dl.spec.wrap dd { margin-bottom: 8px; } }
+</style>
+
+
+<div class="wrap">
+<header class="hero">
+  <span class="eyebrow">Claude skill · video-edit</span>
+  <h1>video-edit Field Guide</h1>
+  <p class="lede">What the video-edit skill can put on screen: fonts, caption styles and word highlights, animation, text behind a person, transitions, zooms, set pieces and layouts, pace and sound, colour grades. Then how it repairs footage, keeps private details off screen, reads its own QA report, and the recipes, numbers and commands it works by. The demos sit on Chockstone's sample baker photos, cropped to the 1080 by 1920 frame the skill renders.</p>
+  <div class="grid" style="--min: 300px">
+    <div class="panel">
+      <h3>How to use it</h3>
+      <p>Ask Claude in plain words. The skill loads on its own for any video request, or type <code>/video-edit</code>. Claude makes the editorial calls and hands over one finished video; it never posts or schedules anything.</p>
+    </div>
+    <div class="panel">
+      <h3>Things you can say</h3>
+      <ul class="plain">
+        <li>“Edit the clips in inbox/haul into one Reel with captions.”</li>
+        <li>“Use boxed captions in DM Sans.”</li>
+        <li>“Put the hook behind my head in Anton.”</li>
+        <li>“Open on a magazine cover and grade it warm film.”</li>
+        <li>“Make a 3D reveal of logos/brand.svg in Blender.”</li>
+        <li>“Check renders/final.mp4 before I post it.”</li>
+        <li>“Blur the shipping label in the unboxing.”</li>
+        <li>“Before and after as a wipe, with a speed ramp through the taping.”</li>
+        <li>“Type the title on with keyboard sounds.”</li>
+        <li>“Pick a cover that works on the grid.”</li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<nav class="index" aria-label="Sections">
+  <div class="chips">
+    <a href="#fonts">Fonts</a><a href="#captions">Captions</a><a href="#animation">Animation</a><a href="#behind">Text behind a person</a>
+    <a href="#transitions">Transitions</a><a href="#looks">Zooms and set pieces</a><a href="#layouts">Layouts</a><a href="#pace">Pace</a><a href="#audio">Audio</a><a href="#grade">Colour grading</a><a href="#zones">Safe zones</a>
+    <a href="#repair">Repair and privacy</a><a href="#qa">QA report</a><a href="#numbers">Numbers</a><a href="#filming">Filming</a><a href="#recipes">Recipes</a><a href="#flow">Workflow</a><a href="#example">Example</a>
+    <a href="#commands">Commands</a><a href="#compliance">Compliance</a><a href="#trouble">Troubleshooting</a><a href="#glossary">Glossary</a><a href="#chockstone">Chockstone</a><a href="#blender">Blender 3D</a><a href="#licences">Licences</a>
+    <button class="btn" id="motion" type="button" aria-pressed="false">Pause motion</button>
+  </div>
+</nav>
+
+<main class="demo-area">
+
+<!-- FONTS -->
+<section id="fonts">
+  <div class="sec-head">
+    <span class="eyebrow">Step 6 · Layer</span>
+    <h2>Fonts</h2>
+    <p class="muted">All nine are free (SIL Open Font License) and on Google Fonts. TikTok Sans is the skill’s default; the other eight are the ones Chockstone’s phone app ships. <b>em/char</b> is Chockstone’s line-break width: characters per line = line width ÷ (font size × em/char). Use a static (non-variable) file for libass and Blender.</p>
+  </div>
+  <div class="grid" style="--min: 250px">
+    <article class="panel font-card">
+      <div class="sample" style="font-family:'TikTok Sans',sans-serif;font-weight:700">so this is my best loaf</div>
+      <div class="meta"><div class="head"><h3>TikTok Sans</h3><span class="tag">Default</span></div>
+        <div class="glyphs" style="font-family:'TikTok Sans',sans-serif;font-weight:700">Aa Bb Gg 0123456789</div>
+        <dl class="spec"><dt>700</dt><dd>sans · captions, hook, CTA</dd></dl></div>
+    </article>
+    <article class="panel font-card">
+      <div class="sample" style="font-family:'Inter',sans-serif;font-weight:600">I use it every night</div>
+      <div class="meta"><div class="head"><h3>Inter</h3><span class="tag">clean</span></div>
+        <div class="glyphs" style="font-family:'Inter',sans-serif;font-weight:600">Aa Bb Gg 0123456789</div>
+        <dl class="spec"><dt>600 · 0.58</dt><dd>sans · plain captions</dd></dl></div>
+    </article>
+    <article class="panel font-card">
+      <div class="sample" style="font-family:'DM Sans',sans-serif;font-weight:700">three things I’d buy again</div>
+      <div class="meta"><div class="head"><h3>DM Sans</h3><span class="tag">boxed</span></div>
+        <div class="glyphs" style="font-family:'DM Sans',sans-serif;font-weight:700">Aa Bb Gg 0123456789</div>
+        <dl class="spec"><dt>700 · 0.57</dt><dd>sans · captions on a box</dd></dl></div>
+    </article>
+    <article class="panel font-card">
+      <div class="sample" style="font-family:'Rubik',sans-serif;font-weight:700">my favorite find this week</div>
+      <div class="meta"><div class="head"><h3>Rubik</h3></div>
+        <div class="glyphs" style="font-family:'Rubik',sans-serif;font-weight:700">Aa Bb Gg 0123456789</div>
+        <dl class="spec"><dt>700 · 0.59</dt><dd>rounded · friendly captions</dd></dl></div>
+    </article>
+    <article class="panel font-card">
+      <div class="sample" style="font-family:'Archivo Black',sans-serif">WAIT FOR IT</div>
+      <div class="meta"><div class="head"><h3>Archivo Black</h3><span class="tag">bold</span></div>
+        <div class="glyphs" style="font-family:'Archivo Black',sans-serif">Aa Bb Gg 0123456789</div>
+        <dl class="spec"><dt>400 · 0.65</dt><dd>display, one weight · outlined captions, titles</dd></dl></div>
+    </article>
+    <article class="panel font-card">
+      <div class="sample" style="font-family:'Anton',sans-serif;font-size:2.4rem">GAME CHANGER</div>
+      <div class="meta"><div class="head"><h3>Anton</h3><span class="tag">pop</span></div>
+        <div class="glyphs" style="font-family:'Anton',sans-serif">Aa Bb Gg 0123456789</div>
+        <dl class="spec"><dt>400 · 0.48</dt><dd>condensed display · word-pop captions, text behind a person</dd></dl></div>
+    </article>
+    <article class="panel font-card">
+      <div class="sample" style="font-family:'Bebas Neue',sans-serif;font-size:2.6rem">SUNDAY RESET</div>
+      <div class="meta"><div class="head"><h3>Bebas Neue</h3></div>
+        <div class="glyphs" style="font-family:'Bebas Neue',sans-serif">AA BB GG 0123456789</div>
+        <dl class="spec"><dt>400 · 0.40</dt><dd>condensed caps · titles, text behind a person</dd></dl></div>
+    </article>
+    <article class="panel font-card">
+      <div class="sample" style="font-family:'Playfair Display',serif;font-weight:700">a slow morning</div>
+      <div class="meta"><div class="head"><h3>Playfair Display</h3></div>
+        <div class="glyphs" style="font-family:'Playfair Display',serif;font-weight:700">Aa Bb Gg 0123456789</div>
+        <dl class="spec"><dt>700 · 0.54</dt><dd>serif · calm lifestyle titles</dd></dl></div>
+    </article>
+    <article class="panel font-card">
+      <div class="sample" style="font-family:'Caveat',cursive;font-weight:700;font-size:2.4rem">note to self</div>
+      <div class="meta"><div class="head"><h3>Caveat</h3></div>
+        <div class="glyphs" style="font-family:'Caveat',cursive;font-weight:700">Aa Bb Gg 0123456789</div>
+        <dl class="spec"><dt>700 · 0.40</dt><dd>handwriting · a short label, never a whole caption</dd></dl></div>
+    </article>
+  </div>
+  <h3 style="margin-top:12px">Display faces for titles</h3>
+  <p class="muted">For a hook, a title card, a cover or a set piece: one display face per video, captions stay in the plain sans. All twelve are SIL Open Font License on Google Fonts, shown here on the footage.</p>
+  <div class="grid" style="--min: 230px">
+    <article class="panel font-card display"><div class="sample" style="font-family:'Instrument Serif',serif;font-style:italic;font-size:2.7rem">the slow rise</div>
+      <div class="meta"><div class="head"><h3>Instrument Serif</h3><span class="tag">editorial</span></div><dl class="spec"><dt>400 · italic</dt><dd>soft editorial titles, lifestyle</dd></dl></div></article>
+    <article class="panel font-card display"><div class="sample" style="font-family:'DM Serif Display',serif">Sunday bake</div>
+      <div class="meta"><div class="head"><h3>DM Serif Display</h3></div><dl class="spec"><dt>400</dt><dd>warm serif titles, home and food</dd></dl></div></article>
+    <article class="panel font-card display"><div class="sample" style="font-family:'Fraunces',serif;font-weight:600">fresh from the oven</div>
+      <div class="meta"><div class="head"><h3>Fraunces</h3></div><dl class="spec"><dt>600</dt><dd>friendly old-style serif, recipes</dd></dl></div></article>
+    <article class="panel font-card display"><div class="sample" style="font-family:'Bodoni Moda',serif;font-weight:700;font-size:2.8rem;letter-spacing:0.02em">CRUMB</div>
+      <div class="meta"><div class="head"><h3>Bodoni Moda</h3><span class="tag">cover</span></div><dl class="spec"><dt>700</dt><dd>didone masthead, <code>MagazineCover</code></dd></dl></div></article>
+    <article class="panel font-card display"><div class="sample" style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:2.5rem">a quiet morning</div>
+      <div class="meta"><div class="head"><h3>Cormorant Garamond</h3></div><dl class="spec"><dt>600</dt><dd>elegant and light; large sizes only</dd></dl></div></article>
+    <article class="panel font-card display"><div class="sample" style="font-family:'Gloock',serif;font-size:2.6rem">Proof</div>
+      <div class="meta"><div class="head"><h3>Gloock</h3></div><dl class="spec"><dt>400</dt><dd>high-contrast display serif, one word</dd></dl></div></article>
+    <article class="panel font-card display"><div class="sample" style="font-family:'Italiana',serif;font-size:2rem;letter-spacing:0.08em">MORNING ROUTINE</div>
+      <div class="meta"><div class="head"><h3>Italiana</h3></div><dl class="spec"><dt>400</dt><dd>thin spaced caps, beauty and fashion</dd></dl></div></article>
+    <article class="panel font-card display"><div class="sample" style="font-family:'Syne',sans-serif;font-weight:800">NEW DROP</div>
+      <div class="meta"><div class="head"><h3>Syne</h3></div><dl class="spec"><dt>800</dt><dd>wide art-school display, launches</dd></dl></div></article>
+    <article class="panel font-card display"><div class="sample" style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:2.1rem">three things I love</div>
+      <div class="meta"><div class="head"><h3>Bricolage Grotesque</h3></div><dl class="spec"><dt>800</dt><dd>quirky grotesque, lists and hauls</dd></dl></div></article>
+    <article class="panel font-card display"><div class="sample" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:2.1rem">12 hrs · 4 steps</div>
+      <div class="meta"><div class="head"><h3>Space Grotesk</h3><span class="tag">numbers</span></div><dl class="spec"><dt>700</dt><dd><code>ChartGrow</code>, <code>UiWorld</code>, figures</dd></dl></div></article>
+    <article class="panel font-card display"><div class="sample" style="font-family:'Unbounded',sans-serif;font-weight:800;font-size:2rem">GLOW UP</div>
+      <div class="meta"><div class="head"><h3>Unbounded</h3></div><dl class="spec"><dt>800</dt><dd>wide rounded, loud titles</dd></dl></div></article>
+    <article class="panel font-card display"><div class="sample" style="font-family:'Great Vibes',cursive;font-size:3rem">with love</div>
+      <div class="meta"><div class="head"><h3>Great Vibes</h3></div><dl class="spec"><dt>400</dt><dd>script, two words at most</dd></dl></div></article>
+  </div>
+  <p class="muted" style="font-size:0.9rem">Fontshare faces (Clash Display, Satoshi, Gambetta) are free under the ITF licence too, but not on Google Fonts. Any other font works if its licence allows video and apps. A glyph the font lacks (an emoji, a ♡) falls back to another font and is measured as one full em when placing text.</p>
+</section>
+
+<!-- CAPTIONS -->
+<section id="captions">
+  <div class="sec-head">
+    <span class="eyebrow">Step 6 · Layer</span>
+    <h2>Caption styles</h2>
+    <p class="muted">One phrase at a time, at most two lines, shown 0.15 s before the first word is heard. The skill’s default is the calm style; Chockstone’s phone draws four named styles. Captions sit low, below the face; <code>place.py</code> moves any phrase that would touch a face.</p>
+  </div>
+  <div class="demo-row">
+    <figure class="demo">
+      <div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><div class="cap low t-calm">so this is my best loaf</div></div>
+      <figcaption><b>Calm</b><span class="tag">Skill default</span><span class="muted">TikTok Sans 700, white, soft shadow, lowercase, no outline, no word picked out.</span></figcaption>
+    </figure>
+    <figure class="demo">
+      <div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><div class="cap low t-clean">So this is my best loaf</div></div>
+      <figcaption><b>clean</b><span class="tag">Chockstone</span><span class="muted">Inter 600, white, soft shadow. The calm choice in the app.</span></figcaption>
+    </figure>
+    <figure class="demo">
+      <div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><div class="cap low t-bold">So this is<br>my best loaf</div></div>
+      <figcaption><b>bold</b><span class="tag">Chockstone</span><span class="muted">Archivo Black, 8% larger, black outline (7% of the size).</span></figcaption>
+    </figure>
+    <figure class="demo">
+      <div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><div class="cap low t-boxed"><span>So this is<br>my best loaf</span></div></div>
+      <figcaption><b>boxed</b><span class="tag">Chockstone</span><span class="muted">DM Sans 700 on a rounded black box at 72%.</span></figcaption>
+    </figure>
+    <figure class="demo">
+      <div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><div class="cap low t-pop"><span>This</span> <span>is</span> <span>my</span> <span>best</span> <span>loaf</span></div></div>
+      <figcaption><b>pop</b><span class="tag">Chockstone</span><span class="muted">Anton, outlined; the word being spoken turns the accent colour (default #FFD60A). High energy: only when the brand asks.</span></figcaption>
+    </figure>
+    <figure class="demo">
+      <div class="frame"><img class="layer" src="img/scoring.webp" alt="" loading="lazy" decoding="async"><div class="cap low t-calm">white on flour and dough</div></div>
+      <figcaption><b>Bright frame, no box</b><span class="tag warn">Fails contrast</span><span class="muted">The shadow is not enough against white dough.</span></figcaption>
+    </figure>
+    <figure class="demo">
+      <div class="frame"><img class="layer" src="img/scoring.webp" alt="" loading="lazy" decoding="async"><div class="cap low t-calm t-box-fix"><span>add a soft box</span></div></div>
+      <figcaption><b>Bright frame, soft box</b><span class="tag ok">Fix</span><span class="muted">A translucent box for that phrase. Check 4.5:1 contrast against the brightest pixels under the text (3:1 for text 24 px or larger).</span></figcaption>
+    </figure>
+    <div class="panel">
+      <h3>Caption rules</h3>
+      <dl class="spec">
+        <dt>2 lines</dt><dd>at most, bottom-heavy; never a 1-2 word top line</dd>
+        <dt>32 chars</dt><dd>per line on a 1080-wide frame (42 for 16:9)</dd>
+        <dt>≤ 20 cps</dt><dd>reading speed; condense the words, never speed up</dd>
+        <dt>0.15 s</dt><dd>shown before the first word</dd>
+        <dt>&lt; 0.6 s</dt><dd>gaps are bridged so captions don’t flicker off</dd>
+        <dt>3-5 words</dt><dd>per phrase conversational, 4-6 calm, 2-3 high energy</dd>
+        <dt>0-10</dt><dd>spelled out; numerals above ten</dd>
+      </dl>
+      <p class="muted">Formats from <code>captions.py</code>: json (Remotion), remotion, srt, vtt, ass.</p>
+    </div>
+  </div>
+  <h3>Word highlights</h3>
+  <p class="muted" style="font-size:0.93rem">Off in the calm style. An energetic style lights the word being said with <code>PhraseCaptions highlight=</code>: one mode per video, colours from <code>brand.json</code>. It needs <code>captions.py --fps</code>, which gives each phrase its words in frames; a phrase whose words do not match shows plain.</p>
+  <div class="grid fx-row">
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-highlight-color.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Colour</b><code>highlight="color"</code><span class="muted">The spoken word turns <code>brand.colors.highlight</code>. Check that colour against the brightest frame it crosses.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-highlight-box.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Box</b><code>highlight="box"</code><span class="muted">An accent chip behind the spoken word. Reads on any background.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-highlight-pop.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Pop</b><code>highlight="pop"</code><span class="muted">The spoken word scales up a little, then settles.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-highlight-karaoke.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Karaoke</b><code>highlight="karaoke"</code><span class="muted">Each word fills left to right over the time it is said. Lyrics, a chant, a slow line.</span></figcaption></figure>
+  </div>
+</section>
+
+<!-- ANIMATION -->
+<section id="animation">
+  <div class="sec-head">
+    <span class="eyebrow">Step 6 · Layer</span>
+    <h2>Animation</h2>
+    <p class="muted">Calm by default: text fades in about 0.3 s, holds dead still, leaves 40-50% faster than it came. Nothing bounces, breathes or creeps unless the brand asks for energy. Remotion drives every move from the frame number, so renders are exact.</p>
+  </div>
+  <div class="demo-row">
+    <figure class="demo a-calm">
+      <div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><div class="cap high t-calm">my saturday sourdough</div></div>
+      <figcaption><b>Hook fade</b><span class="muted">In over 9 frames on <code>bezier(0.16,1,0.3,1)</code>, held, out over 5. <code>CalmText</code>.</span></figcaption>
+    </figure>
+    <figure class="demo a-stagger">
+      <div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><div class="cap high t-calm"><span>three</span> <span>tips</span><br><span>for</span> <span>better</span> <span>crust</span></div></div>
+      <figcaption><b>Word stagger</b><span class="muted">Words 2-4 frames apart; letters 1; list items 1-3.</span></figcaption>
+    </figure>
+    <figure class="demo a-phrase">
+      <div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async">
+        <div class="cap low t-calm">so this is</div><div class="cap low t-calm">my saturday</div><div class="cap low t-calm">sourdough</div></div>
+      <figcaption><b>Phrase captions</b><span class="muted">One phrase replaces the last with a 3-4 frame fade. <code>PhraseCaptions</code>.</span></figcaption>
+    </figure>
+    <figure class="demo">
+      <div class="frame"><img class="layer" src="img/rolls.webp" alt="" loading="lazy" decoding="async"><div class="logo-badge">Hearth</div></div>
+      <figcaption><b>Logo on its word</b><span class="muted">Eases in over 6-9 frames on the word that names it, held while the line plays.</span></figcaption>
+    </figure>
+    <figure class="demo a-kb">
+      <div class="frame"><img class="layer" src="img/rolls.webp" alt="" loading="lazy" decoding="async"></div>
+      <figcaption><b>Slow push on a still</b><span class="muted">Scale 1.00 to 1.06 over the hold (Ken Burns).</span></figcaption>
+    </figure>
+    <figure class="demo a-good">
+      <div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><div class="cap high t-calm">lands and stops</div></div>
+      <figcaption><b>Settle</b><span class="tag ok">Do</span><span class="muted"><code>spring({damping: 200})</code>: no overshoot.</span></figcaption>
+    </figure>
+    <figure class="demo a-bad">
+      <div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><div class="cap high t-calm">boing boing</div></div>
+      <figcaption><b>Bounce</b><span class="tag warn">Avoid</span><span class="muted">Remotion’s default spring (damping 10) overshoots. Only for a brand that asks for it.</span></figcaption>
+    </figure>
+  </div>
+  <div class="grid" style="--min: 280px">
+    <div class="panel">
+      <h3>Timing</h3>
+      <dl class="spec">
+        <dt>9 frames</dt><dd>fade in (0.3 s at 30 fps)</dd>
+        <dt>-40-50%</dt><dd>exit length versus entrance</dd>
+        <dt>0.5 + 0.3/word</dt><dd>seconds a title holds; last line 2 s or more</dd>
+        <dt>chars ÷ 20</dt><dd>seconds a hook holds (40 characters = 2 s)</dd>
+        <dt>4-9%</dt><dd>of frame height for titles (77-173 px)</dd>
+        <dt>2.5-4%</dt><dd>for body text (48-77 px)</dd>
+      </dl>
+    </div>
+    <div class="panel">
+      <h3>Tools</h3>
+      <dl class="spec">
+        <dt>Remotion</dt><dd>text, captions, logos, overlays, light 3D (<code>@remotion/three</code>)</dd>
+        <dt>GSAP</dt><dd>choreographed timelines inside Remotion</dd>
+        <dt>Lottie, Rive</dt><dd>designer-made vector motion</dd>
+        <dt>Manim</dt><dd>math and diagram explainers</dd>
+        <dt>Blender</dt><dd>path-traced glass, metal, product spins</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- TEXT BEHIND A PERSON -->
+<section id="behind">
+  <div class="sec-head">
+    <span class="eyebrow">Step 6 · Layer</span>
+    <h2>Text behind a person</h2>
+    <p class="muted">A big title that sits behind the head: the footage, then the text, then the person cut out and laid back on top. For the hook or a title card, never for captions. The cutout below is Apple Vision's person segmentation (accurate) run on the photo as is.</p>
+  </div>
+  <div class="tbh">
+    <div class="frame" role="img" aria-label="The word RISE sits behind the baker's head">
+      <img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async">
+      <svg class="title-svg" viewBox="0 0 1080 1920" aria-hidden="true"><text x="540" y="1050" text-anchor="middle" font-family="Anton, Impact, sans-serif" font-size="380" fill="var(--cap)" letter-spacing="8">RISE</text></svg>
+      <img class="layer" src="img/person.webp" alt="" loading="lazy" decoding="async">
+    </div>
+    <div style="display:grid;gap:14px;min-width:0">
+      <div class="stack-mini" aria-label="The three layers, bottom to top">
+        <figure><div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"></div><figcaption>1 · footage</figcaption></figure>
+        <span class="op">+</span>
+        <figure><div class="frame checker"><svg class="title-svg" viewBox="0 0 1080 1920" aria-hidden="true"><text x="540" y="1050" text-anchor="middle" font-family="Anton, Impact, sans-serif" font-size="380" fill="var(--cap)" letter-spacing="8">RISE</text></svg></div><figcaption>2 · title</figcaption></figure>
+        <span class="op">+</span>
+        <figure><div class="frame checker"><img class="layer" src="img/person.webp" alt="" loading="lazy" decoding="async"></div><figcaption>3 · person, matted</figcaption></figure>
+      </div>
+      <ol class="flow">
+        <li><b>Matte the person on the cut</b><span class="k">A draft render, not the sources. macOS: <code>matte work/draft.mp4 work/mask.mp4 --person work/person.webm</code> (the skill’s <code>matte.swift</code>, Apple Vision; a 3 s clip takes about 5 s). It writes a grey mask, white where the person is, and the cutout on VP9 alpha with the edge softened. Elsewhere: MediaPipe. Fine hair or several people: SAM 2 or BiRefNet.</span></li>
+        <li><b>Stack three layers</b><span class="k">ffmpeg: footage, title, then the footage with the matte as alpha. Remotion: the cut, <code>CalmText</code>, then <code>person.webm</code> (VP9 alpha) with <code>transparent</code>.</span></li>
+        <li><b>Check the sheet</b><span class="k"><code>place.py</code> would move this title off the face, so skip it for this one title and look at the frames instead.</span></li>
+      </ol>
+      <div class="panel">
+        <h3>Rules</h3>
+        <ul class="plain">
+          <li>A heavy display face (Anton, Bebas Neue, Archivo Black) at 10-20% of frame height, in the top third.</li>
+          <li>The head covers part of a letter or two, never a whole word.</li>
+          <li>The person holds fairly still while it shows (1.5-3 s).</li>
+          <li>Smooth the matte over time (<code>tmedian</code>) or the edge flickers.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="codebox"><pre><code>ffmpeg -i cut.mp4 -i mask.mp4 -itsoffset 0.5 -i title.mov -filter_complex \
+"[1:v]format=gray,tmedian=radius=1,gblur=sigma=1.5[m];\
+[2:v]scale=out_color_matrix=bt709:out_range=tv,format=yuva420p[ti];\
+[0:v]split[bg][fg0];[fg0][m]alphamerge[fg];[bg][ti]overlay=eof_action=pass[t];\
+[t][fg]overlay,format=yuv420p,setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=tv[v]" \
+    -map "[v]" -map 0:a -c:v libx264 -preset slow -crf 15 -c:a copy out.mp4</code></pre></div>
+  <p class="muted" style="font-size:0.88rem">Tested on ffmpeg 8.1. Converting the title first (<code>[ti]</code>) matters: left to ffmpeg inside this graph, the title’s colour shifts.</p>
+</section>
+
+<!-- TRANSITIONS -->
+<section id="transitions">
+  <div class="sec-head">
+    <span class="eyebrow">Step 5-6 · Cut and layer</span>
+    <h2>Transitions</h2>
+    <p class="muted">The hard cut is the default. Pick one to three kinds per video and keep the same join for the same meaning. A transition never hides a cut that shouldn’t exist. Lengths are frames at 30 fps; <code>edl.py</code> centres each on the cut so the video keeps its length and the audio still cuts on the word.</p>
+  </div>
+  <div class="grid tr-grid">
+    <div class="panel tr tr-cut"><div class="frame"><img class="layer A" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer B" src="img/rolls.webp" alt="" loading="lazy" decoding="async"></div>
+      <div class="info"><h3>Hard cut</h3><span class="tag ok">Default</span><span class="k">0 frames · no transition</span><span>Talking head to B-roll, take to take, anything on a word.</span></div></div>
+    <div class="panel tr tr-fade"><div class="frame"><img class="layer A" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer B" src="img/rolls.webp" alt="" loading="lazy" decoding="async"></div>
+      <div class="info"><h3>Cross dissolve</h3><span class="tag">Calm</span><span class="k">12-18 f · ffmpeg fade · Remotion fade()</span><span>Two takes of one set-up; two actions inside one clip; a cut that would jump.</span></div></div>
+    <div class="panel tr tr-dipb"><div class="frame"><img class="layer A" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer B" src="img/rolls.webp" alt="" loading="lazy" decoding="async"><div class="layer X"></div></div>
+      <div class="info"><h3>Dip to black</h3><span class="tag">Calm</span><span class="k">16-24 f · fadeblack</span><span>A real break in topic or time. Once or twice a video at most.</span></div></div>
+    <div class="panel tr tr-dipw"><div class="frame"><img class="layer A" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer B" src="img/rolls.webp" alt="" loading="lazy" decoding="async"><div class="layer X"></div></div>
+      <div class="info"><h3>Dip to white</h3><span class="tag">Calm</span><span class="k">16-24 f · fadewhite</span><span>The same break with a brighter feel.</span></div></div>
+    <div class="panel tr tr-push"><div class="frame"><img class="layer A" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer B" src="img/rolls.webp" alt="" loading="lazy" decoding="async"></div>
+      <div class="info"><h3>Push</h3><span class="tag">Stylized</span><span class="k">8-15 f · slideleft · Remotion slide()</span><span>Lists and reveals, when something on screen already moves that way.</span></div></div>
+    <div class="panel tr tr-cover"><div class="frame"><img class="layer A" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer B" src="img/rolls.webp" alt="" loading="lazy" decoding="async"></div>
+      <div class="info"><h3>Cover</h3><span class="tag">Stylized</span><span class="k">8-15 f · coverleft</span><span>The next shot slides over a still one.</span></div></div>
+    <div class="panel tr tr-wipe"><div class="frame"><img class="layer A" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer B" src="img/rolls.webp" alt="" loading="lazy" decoding="async"></div>
+      <div class="info"><h3>Wipe</h3><span class="tag">Stylized</span><span class="k">8-15 f · wipeleft · Remotion wipe()</span><span>A clean edge sweeps the next shot in.</span></div></div>
+    <div class="panel tr tr-circle"><div class="frame"><img class="layer A" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer B" src="img/rolls.webp" alt="" loading="lazy" decoding="async"></div>
+      <div class="info"><h3>Iris open</h3><span class="tag">Stylized</span><span class="k">8-15 f · circleopen · Remotion iris()</span><span>A reveal from the centre.</span></div></div>
+    <div class="panel tr tr-zoom"><div class="frame"><img class="layer A" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer B" src="img/rolls.webp" alt="" loading="lazy" decoding="async"></div>
+      <div class="info"><h3>Zoom through</h3><span class="tag">Stylized</span><span class="k">8-15 f · zoomin</span><span>Pushes into the first shot as the second appears.</span></div></div>
+    <div class="panel tr tr-leak"><div class="frame"><img class="layer A" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer B" src="img/rolls.webp" alt="" loading="lazy" decoding="async"><div class="layer X"></div></div>
+      <div class="info"><h3>Light leak</h3><span class="tag">Brand energy</span><span class="k">10-20 f · Remotion Overlay</span><span>A warm flash over a hard cut; the cut and the length stay put.</span></div></div>
+  </div>
+  <details>
+    <summary>All 58 ffmpeg xfade types (8.1)</summary>
+    <div class="chips-list">
+      <code>fade</code><code>fadeblack</code><code>fadewhite</code><code>fadegrays</code><code>fadefast</code><code>fadeslow</code><code>dissolve</code><code>distance</code>
+      <code>wipeleft</code><code>wiperight</code><code>wipeup</code><code>wipedown</code><code>wipetl</code><code>wipetr</code><code>wipebl</code><code>wipebr</code>
+      <code>slideleft</code><code>slideright</code><code>slideup</code><code>slidedown</code><code>smoothleft</code><code>smoothright</code><code>smoothup</code><code>smoothdown</code>
+      <code>coverleft</code><code>coverright</code><code>coverup</code><code>coverdown</code><code>revealleft</code><code>revealright</code><code>revealup</code><code>revealdown</code>
+      <code>circlecrop</code><code>rectcrop</code><code>circleopen</code><code>circleclose</code><code>vertopen</code><code>vertclose</code><code>horzopen</code><code>horzclose</code><code>radial</code>
+      <code>diagtl</code><code>diagtr</code><code>diagbl</code><code>diagbr</code><code>hlslice</code><code>hrslice</code><code>vuslice</code><code>vdslice</code><code>hlwind</code><code>hrwind</code><code>vuwind</code><code>vdwind</code>
+      <code>squeezeh</code><code>squeezev</code><code>zoomin</code><code>pixelize</code><code>hblur</code>
+    </div>
+    <p class="muted" style="margin-top:10px;font-size:0.9rem">In an EDL: <code>"transition": {"type": "fade", "frames": 16}</code> on the segment after the cut. <code>edl.py check</code> rejects names ffmpeg lacks.</p>
+  </details>
+  <details>
+    <summary>Remotion presentations (4.0.539) and shaders</summary>
+    <div class="chips-list">
+      <code>fade</code><code>dissolve</code><code>slide</code><code>wipe</code><code>flip</code><code>clock-wipe</code><code>iris</code><code>none</code><code>blur-slide</code><code>book-flip</code>
+      <code>cross-zoom</code><code>crosswarp</code><code>dreamy-zoom</code><code>film-burn</code><code>linear-blur</code><code>push-cut</code><code>ripple</code><code>swap</code><code>zoom-blur</code><code>zoom-in-out</code>
+    </div>
+    <p class="muted" style="margin-top:10px;font-size:0.9rem">Import each from <code>@remotion/transitions/&lt;name&gt;</code>. <code>TransitionSeries</code> overlaps neighbours and shortens the total; <code>TransitionSeries.Overlay</code> sits on a cut without changing it. Shader transitions (gl-transitions via <code>@gl-transitions/remotion</code>) are rare and never in a calm edit.</p>
+  </details>
+</section>
+
+<!-- ZOOMS AND SET PIECES -->
+<section id="looks">
+  <div class="sec-head">
+    <span class="eyebrow">Step 6 · Layer</span>
+    <h2>Zooms and set pieces</h2>
+    <p class="muted">Each is a component in <code>templates/remotion/Looks.tsx</code>, rendered here in Remotion on the baker photo. One set piece per video, two at most, never back to back, and each has to show what is said: the chart grows on the number she says, the phone holds the app she names. The cover and the orbit use the <code>matte.swift</code> cutout so the words pass behind her.</p>
+  </div>
+  <h3>Zooms</h3>
+  <div class="grid fx-row">
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-push.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Slow push</b><code>Zoom keys={[[0, 1], [end, 1.06]]}</code><span class="muted">2-3% a second, eased. A long hold on a face; calm by default.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-digital.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Digital zoom</b><code>Zoom keys={[[0,1],[4,1.3],[14,1.3],[18,1.7]…]}</code><span class="muted">Two 4-frame steps, a hold, an eased return. Points at a detail she names. A single key (1.12) is the punch-in that hides a jump cut.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-through.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Zoom-through cut</b><code>ZoomThrough a b cut frames={12}</code><span class="muted">A pushes to 3x with a 14 px blur, B lands from 1.6x. A change of place or time; aim the origin at something dark or plain.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-vertigo.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Vertigo (dolly zoom)</b><code>Vertigo background person scale={1.25}</code><span class="muted">She holds at 1.25 while the room eases from 1.25 to 1 over 1.5-3 s. A realisation. Never scale the room past her: a bigger copy of her shows around the cutout.</span></figcaption></figure>
+  </div>
+  <h3>Title styles</h3>
+  <div class="grid fx-row">
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-magazine.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Magazine cover</b><code>MagazineCover title lines issue top</code><span class="muted">A launch, a reveal, an episode of a series. Bodoni Moda masthead behind the head; set <code>top</code> so hair covers part of a letter.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-wall.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Headline wall</b><code>HeadlineWall lines every={10}</code><span class="muted">Press, reviews, “everyone is talking about it”. Real quotes only, with the source in the caption; her own line lands last.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-paper.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Paper cut</b><code>PaperCut text tilt={-3}</code><span class="muted">Torn paper behind a short title. Recipes, DIY, scrapbook, a handmade brand.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" src="img/fx-typing.mp4" controls playsinline preload="auto"></video></div>
+      <figcaption><b>Typed on, with key sounds</b><code>TypeOn text frames</code><span class="muted">A search, a message, a list being written. <code>typeon.py</code> writes the letter timings and a click track from one schedule, so each click lands on its letter. Press play to hear it; it sits at -12 dB under a voice.</span></figcaption></figure>
+  </div>
+  <h3>Overlays</h3>
+  <div class="grid fx-row">
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-phone.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Phone mockup</b><code>PhoneMockup scale={0.62}</code><span class="muted">An app, a product page, a post or a screen recording, framed in a phone. Captions go above or below it.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-chart.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Chart grow</b><code>ChartGrow bars unit</code><span class="muted">Bars rise 4 frames apart and their values count up. A figure she says; real numbers only, and no burned-in price where a project forbids it.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-orbit.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Orbit</b><code>Orbit background person words</code><span class="muted">3-5 short words circle her head once in 6 s, passing behind her on the far side. The one set piece that keeps moving.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-ui.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>UI world</b><code>UiWorld items</code><span class="muted">Search bar, notification, chat bubble and like count drift around her; <code>behind</code> tucks one under her. A story about an app, a message or a search.</span></figcaption></figure>
+  </div>
+  <p class="muted" style="font-size:0.9rem">Zoom in Remotion, not with ffmpeg’s <code>zoompan</code>, which moves in whole pixels and jitters on a slow push. Vertigo and big punch-ins want footage at least 1.25x the output (4K for a 1080 render). Check each on the sheet (<code>edl.py qa --sheet</code>) for text on a face and for the app’s buttons covering it.</p>
+</section>
+
+<!-- LAYOUTS -->
+<section id="layouts">
+  <div class="sec-head">
+    <span class="eyebrow">Step 6 · Layer</span>
+    <h2>Layouts</h2>
+    <p class="muted">Components in <code>templates/remotion/Layouts.tsx</code>. Green screen and background blur use the <code>matte.swift</code> cutout, so nobody needs a green cloth; the callout follows <code>track.swift</code>. Each one shows what is said: a split screen for a comparison, a counter for a list.</p>
+  </div>
+  <div class="grid fx-row">
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-green.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Green screen</b><code>GreenScreen person background</code><span class="muted">Talking over a page, a product listing or a photo. The matte cuts the person out; <code>position</code> and <code>scale</code> place them.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-split-side.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Split screen</b><code>SplitScreen a b mode="side"</code><span class="muted">This against that, or two angles. Each pane crops and <code>focus</code> picks what stays; <code>"stack"</code> puts one above the other.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-split-wipe.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Before and after</b><code>SplitScreen mode="wipe"</code><span class="muted">A divider drags across one frame. Proof in a review: the same framing and light both times.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-blurbg.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Background blur</b><code>BlurBackground footage person blur={24}</code><span class="muted">Lifts the person off a busy or messy room; eases in over <code>inFrames</code>.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-callout.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Tracked callout</b><code>Callout track text side arrow</code><span class="muted">A label that follows an object through the shot, and fades when tracking is lost.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-list.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>List counter</b><code>ListCounter count total corner</code><span class="muted">“3 things…”: the number rolls up at each item. <code>count</code> takes <code>[[frame, n], …]</code>.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-chapter.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Chapter card</b><code>ChapterCard title kicker mode="lower"</code><span class="muted">Steps of a tutorial, parts of a long video. <code>"full"</code> fills the frame.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><video class="layer" data-fx src="img/fx-sticker.mp4" muted loop playsinline preload="auto"></video></div>
+      <figcaption><b>Sticker</b><code>Sticker text mode="pop" tilt</code><span class="muted">An emoji or a word on a moment, clamped to the safe zone. <code>"fade"</code> for a calm video.</span></figcaption></figure>
+  </div>
+  <p class="muted" style="font-size:0.9rem">Callout, sticker and split-screen labels estimate text width at 0.56 em a character, so check long labels on the qa sheet. Fonts and colours come from <code>brand.json</code>, so layouts match the captions.</p>
+</section>
+
+<!-- PACE -->
+<section id="pace">
+  <div class="sec-head">
+    <span class="eyebrow">Step 5 · Cut</span>
+    <h2>Pace</h2>
+    <p class="muted">Pace is a style choice. The default is calm; an energetic style turns on ramps, punch-ins, effects and highlights. One rule holds in every style: a cut never clips a word.</p>
+  </div>
+  <div class="scroll"><table><thead><tr><th></th><th>Calm (default)</th><th>Energetic</th></tr></thead><tbody>
+<tr><td><b>Cuts</b></td><td>Only dead air; a cut must save 0.6 s</td><td>Tighter; a punch-in hides each jump cut</td></tr>
+<tr><td><b>Shots</b></td><td>2 s or more between two changes; cutaways 2-6 s</td><td>Shorter, still changing on words</td></tr>
+<tr><td><b>Speed</b></td><td>Real time; an action plays whole, as an interlude if it outlasts the line</td><td>Ramps through the dull middle; slow motion on a reveal</td></tr>
+<tr><td><b>Text</b></td><td>Fades in and holds still</td><td>Stickers, word highlights, a pop</td></tr>
+<tr><td><b>Sound</b></td><td>Voice and music</td><td>One effect per moment: a whoosh on a swipe, a pop as a sticker lands</td></tr>
+<tr><td><b>Shorten by</b></td><td>Dropping lines</td><td>Dropping lines, then ramps</td></tr>
+</tbody></table></div>
+  <div class="grid" style="--min: 320px">
+    <div class="panel"><h3>Speed ramp</h3>
+      <svg class="diagram" viewBox="0 0 520 230" role="img" aria-label="A speed ramp: real time, up to 5x through the middle, back to real time">
+        <rect class="area" x="252" y="30" width="180" height="150" rx="4"/>
+        <path class="axis" d="M50 20V180H500"/><path class="guide" d="M50 160H500"/>
+        <text x="44" y="164" text-anchor="end">1x</text><text x="44" y="44" text-anchor="end">5x</text>
+        <polyline class="curve" points="50,160 207,160 252,40 432,40 500,160"/>
+        <g fill="var(--accent)"><circle cx="50" cy="160" r="4"/><circle cx="207" cy="160" r="4"/><circle cx="252" cy="40" r="4"/><circle cx="432" cy="40" r="4"/><circle cx="500" cy="160" r="4"/></g>
+        <text class="lbl" x="128" y="150" text-anchor="middle">real time</text>
+        <text class="lbl" x="342" y="78" text-anchor="middle">the dull middle at 5x</text>
+        <text x="342" y="108" text-anchor="middle">sound muted</text>
+        <text x="50" y="200" text-anchor="middle">0</text><text x="207" y="200" text-anchor="middle">0.35</text><text x="252" y="200" text-anchor="middle">0.45</text><text x="432" y="200" text-anchor="middle">0.85</text><text x="500" y="200" text-anchor="middle">1</text>
+        <text x="275" y="224" text-anchor="middle">position in the segment’s source span</text>
+      </svg>
+      <p>Keys are (position in the segment, rate): <code>"speed": [[0, 1], [0.35, 1], [0.45, 5], [0.85, 5], [1, 1]]</code>. A ramp mutes the source sound; lay music or an effect over it. <code>"speed": 2</code> plays a whole segment at twice speed with the voice pitch kept (natural up to about 1.5x); <code>0.5</code> is slow motion, <code>"smooth": true</code> makes new frames. Shoot 60 fps for slow motion.</p>
+    </div>
+    <div class="panel"><h3>J cut</h3>
+      <svg class="diagram" viewBox="0 0 520 190" role="img" aria-label="J cut: the next shot’s sound starts under the end of this picture">
+        <text x="10" y="64">picture</text><text x="10" y="124">sound</text>
+        <rect class="pic" x="80" y="44" width="220" height="32" rx="4"/><rect class="pic" x="300" y="44" width="200" height="32" rx="4"/>
+        <text class="lbl" x="190" y="65" text-anchor="middle">A</text><text class="lbl" x="400" y="65" text-anchor="middle">B</text>
+        <rect class="snd" x="80" y="104" width="160" height="32" rx="4"/><rect class="snd" x="240" y="104" width="260" height="32" rx="4"/>
+        <text class="lbl" x="160" y="125" text-anchor="middle">A</text><text class="lbl" x="370" y="125" text-anchor="middle">B</text>
+        <line class="mark" x1="300" y1="30" x2="300" y2="150"/><text x="300" y="22" text-anchor="middle">cut</text>
+        <path class="axis" d="M240 158v8h60v-8"/><text x="270" y="184" text-anchor="middle">audio_lead</text>
+      </svg>
+      <p>The next segment’s sound starts before its picture: the viewer hears the new place first. <code>"audio_lead": 10</code> (frames) on the segment after the cut.</p>
+    </div>
+    <div class="panel"><h3>L cut</h3>
+      <svg class="diagram" viewBox="0 0 520 190" role="img" aria-label="L cut: this shot’s sound runs on under the next picture">
+        <text x="10" y="64">picture</text><text x="10" y="124">sound</text>
+        <rect class="pic" x="80" y="44" width="220" height="32" rx="4"/><rect class="pic" x="300" y="44" width="200" height="32" rx="4"/>
+        <text class="lbl" x="190" y="65" text-anchor="middle">A</text><text class="lbl" x="400" y="65" text-anchor="middle">B</text>
+        <rect class="snd" x="80" y="104" width="280" height="32" rx="4"/><rect class="snd" x="360" y="104" width="140" height="32" rx="4"/>
+        <text class="lbl" x="220" y="125" text-anchor="middle">A</text><text class="lbl" x="430" y="125" text-anchor="middle">B</text>
+        <line class="mark" x1="300" y1="30" x2="300" y2="150"/><text x="300" y="22" text-anchor="middle">cut</text>
+        <path class="axis" d="M300 158v8h60v-8"/><text x="330" y="184" text-anchor="middle">audio_trail</text>
+      </svg>
+      <p>A segment’s sound runs on under the next picture: a laugh that carries, a line finishing over the reaction. <code>"audio_trail": 10</code>. 6-15 frames is typical; the source needs that much room, and <code>edl.py check</code> says when it does not.</p>
+    </div>
+    <div class="panel"><h3>Interlude (calm)</h3>
+      <svg class="diagram" viewBox="0 0 520 190" role="img" aria-label="An interlude: the voice pauses while a clip plays whole with its own sound, then the next line follows">
+        <text x="10" y="64">picture</text><text x="10" y="124">sound</text>
+        <rect class="pic" x="80" y="44" width="130" height="32" rx="4"/><rect class="pic" x="210" y="44" width="190" height="32" rx="4"/><rect class="pic" x="400" y="44" width="100" height="32" rx="4"/>
+        <text class="lbl" x="145" y="65" text-anchor="middle">line 4</text><text class="lbl" x="305" y="65" text-anchor="middle">the clip, whole</text><text class="lbl" x="450" y="65" text-anchor="middle">line 5</text>
+        <rect class="snd" x="80" y="104" width="130" height="32" rx="4"/><rect class="snd" x="210" y="112" width="190" height="16" rx="3" fill-opacity="0.1"/><rect class="snd" x="400" y="104" width="100" height="32" rx="4"/>
+        <text x="305" y="160" text-anchor="middle">its own sound at -12 dB</text>
+      </svg>
+      <p>Footage whose action outlasts the line plays in full after it, in real time: the voice pauses, the clip plays, the next line follows. <code>"interludes": [{"after_line": 4, "clip": "broll/packing.mp4"}]</code> in the plan. Actions inside one clip join with 0.6 s dissolves. The video gets longer; that is fine.</p>
+    </div>
+  </div>
+</section>
+
+<!-- AUDIO -->
+<section id="audio">
+  <div class="sec-head">
+    <span class="eyebrow">Step 7 · Mix</span>
+    <h2>Audio made visible</h2>
+    <p class="muted">Clean voice, takes matched within 1 dB, music 15-20 dB under the words, one master at -14 LUFS and -1 dBTP with one gain and a limiter. Music and effects only under a licence that covers the use.</p>
+  </div>
+  <div class="grid" style="--min: 320px">
+    <div class="panel"><h3>Ducking</h3>
+      <svg class="diagram" viewBox="0 0 520 180" role="img" aria-label="Music ducks under the voice and comes back up between phrases">
+        <text x="10" y="44">voice</text><text x="10" y="122">music</text>
+        <rect class="snd" x="80" y="26" width="120" height="28" rx="4"/><rect class="snd" x="240" y="26" width="140" height="28" rx="4"/><rect class="snd" x="420" y="26" width="80" height="28" rx="4"/>
+        <path class="guide" d="M80 96H500"/>
+        <path class="curve" d="M80 140H200L225 96H240L250 140H380L405 96H420L430 140H500"/>
+        <text x="232" y="86" text-anchor="middle">-9 dB</text>
+        <text x="315" y="164" text-anchor="middle">about 12 dB further down</text>
+      </svg>
+      <p><code>master.py mix --music bed.wav</code> sets the bed <code>--gap-db</code> (default -9) under the voice’s loudness, then a sidechain compressor pushes it about 12 dB further down while the voice talks, so it breathes back up between phrases.</p>
+    </div>
+    <div class="panel"><h3>Room tone</h3>
+      <svg class="diagram" viewBox="0 0 520 170" role="img" aria-label="A muted gap: digital silence against room tone">
+        <text x="10" y="54">without</text><text x="10" y="124">room_tone</text>
+        <rect class="snd" x="90" y="36" width="130" height="28" rx="4"/><rect class="snd" x="340" y="36" width="160" height="28" rx="4"/>
+        <line class="flat" x1="220" y1="50" x2="340" y2="50"/><text x="280" y="26" text-anchor="middle">heard as a dropout</text>
+        <rect class="snd" x="90" y="106" width="130" height="28" rx="4"/><rect class="snd" x="340" y="106" width="160" height="28" rx="4"/>
+        <polyline class="noise" points="220,120.7 224,117.6 228,119.5 232,124.5 236,116.7 240,119.9 244,119.5 248,122.6 252,119.8 256,115.9 260,123.7 264,119.7 268,120.3 272,117.4 276,120.9 280,123.7 284,115.9 288,120.6 292,119.9 296,122.5 300,118.5 304,116.9 308,124.3 312,119.0 316,120.0 320,117.6 324,122.1 328,122.5 332,115.6 336,121.5 340,120.1"/><text x="280" y="156" text-anchor="middle">the room, looped</text>
+      </svg>
+      <p>Digital silence under a muted shot or a ramp sounds like a dropout. <code>"room_tone": "work/room.wav"</code> at the EDL’s top level loops the room under every gap with 30 ms fades. No recording? <code>quiet.py tone take.mov work/room.wav</code> lifts the longest quiet stretch (it refuses under 0.5 s).</p>
+    </div>
+    <div class="panel"><h3>Sound effects on the beat</h3>
+      <svg class="diagram" viewBox="0 0 520 180" role="img" aria-label="A whoosh aligned by its start peaks late; aligned by its peak, it peaks on the cut">
+        <text x="10" y="59">align: start</text><text x="10" y="134">align: peak</text>
+        <path class="wave" d="M260 55 C295 53 318 32 330 29 C338 32 372 53 390 55 C372 57 338 78 330 81 C318 78 295 57 260 55Z"/><path class="wave" d="M190 130 C225 128 248 107 260 104 C268 107 302 128 320 130 C302 132 268 153 260 156 C248 153 225 132 190 130Z"/>
+        <line class="mark" x1="260" y1="20" x2="260" y2="168"/><text x="260" y="14" text-anchor="middle">cut</text>
+        <text x="398" y="59">peak late</text><text x="330" y="134">peak on the cut</text>
+      </svg>
+      <p><code>"sfx": [{"path": "sfx/whoosh.wav", "at": {"seg": 3}, "align": "peak"}]</code>. <code>at</code> takes seconds, a segment, a word or a cutaway; default -8 dB. Licensed or CC0 files only, each with its source page and SHA-256 in <code>sfx/SOURCES.txt</code>; a synthesized chime or tick needs no licence.</p>
+    </div>
+    <div class="panel"><h3>Typing sounds</h3>
+      <svg class="diagram" viewBox="0 0 520 160" role="img" aria-label="Each typed letter has a key click on the same frame; the space bar thumps lower">
+        <text x="10" y="58">picture</text><text x="10" y="108">keys</text>
+        <text class="lbl" x="80" y="62" text-anchor="middle" style="font-size:22px">b</text><text class="lbl" x="124" y="62" text-anchor="middle" style="font-size:22px">e</text><text class="lbl" x="168" y="62" text-anchor="middle" style="font-size:22px">s</text><text class="lbl" x="212" y="62" text-anchor="middle" style="font-size:22px">t</text><text class="lbl" x="300" y="62" text-anchor="middle" style="font-size:22px">l</text><text class="lbl" x="344" y="62" text-anchor="middle" style="font-size:22px">o</text><text class="lbl" x="388" y="62" text-anchor="middle" style="font-size:22px">a</text><text class="lbl" x="432" y="62" text-anchor="middle" style="font-size:22px">f</text>
+        <path class="guide" d="M66 118H470"/><line x1="80" y1="118" x2="80" y2="100" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="124" y1="118" x2="124" y2="93" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="168" y1="118" x2="168" y2="97" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="212" y1="118" x2="212" y2="90" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="256" y1="118" x2="256" y2="84" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"/><line x1="300" y1="118" x2="300" y2="98" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="344" y1="118" x2="344" y2="91" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="388" y1="118" x2="388" y2="95" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/><line x1="432" y1="118" x2="432" y2="99" stroke="var(--ok)" stroke-width="3" stroke-linecap="round"/>
+        <text x="256" y="146" text-anchor="middle">space</text>
+      </svg>
+      <p><code>typeon.py "best loaf" -o work/title</code> writes the <code>TypeOn</code> letter frames and a key track from one schedule: synthesized clicks, or <code>--samples DIR</code> of recorded keys (a file with “space” in its name for the space bar). Add the <code>sfx</code> entry it prints at the title’s start; -12 dB under a voice.</p>
+    </div>
+  </div>
+  <div class="grid" style="--min: 260px">
+    <div class="panel"><h3>Music</h3><p>A subscription library, or a sound the person adds in the app after export. Creator plans cover the person’s own channels, not paid ads, brand promotion or client work. Audio pulled with yt-dlp is a beat reference only, never in a render.</p></div>
+    <div class="panel"><h3>Two mics</h3><p><code>probe.py --levels</code> finds the louder channel. Use it alone (<code>"channel": N</code>): two mics summed sound hollow and phasey.</p></div>
+    <div class="panel"><h3>Master</h3><p>One gain to -14 LUFS, then a limiter at -1 dBTP. A dynamic <code>loudnorm</code> on the mix pumps and breathes; <code>edl.py qa</code> fails a render more than 0.5 LU off.</p></div>
+  </div>
+</section>
+
+<!-- COLOUR GRADING -->
+<section id="grade">
+  <div class="sec-head">
+    <span class="eyebrow">Step 7 · Grade and mix</span>
+    <h2>Colour grading</h2>
+    <p class="muted">Grade the cut before captions, titles and logos go on, so text and brand colours stay exact. Match the takes first (exposure and white balance until skin looks the same shot to shot), then one look over the whole edit, light by default. Last check: the product still looks like its listing photo, because a shopper buys that colour. Hold or hover a frame to see it as shot.</p>
+  </div>
+  <div class="grid grade" style="--min: 170px">
+    <figure class="demo"><div class="frame"><img class="layer" src="img/baker.webp" alt="The photo as shot" loading="lazy" decoding="async"></div>
+      <figcaption><b>As shot</b><span class="muted">Conformed to BT.709, no look.</span></figcaption></figure>
+    <figure class="demo"><div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer top" src="img/g-clean.webp" alt="Clean bright grade" loading="lazy" decoding="async"></div>
+      <figcaption><b>Clean bright</b><span class="muted">Lifestyle, product on white.</span><code>exposure=exposure=0.25,eq=contrast=0.94:saturation=0.92,colortemperature=temperature=7000:mix=0.6</code></figcaption></figure>
+    <figure class="demo"><div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer top" src="img/g-film.webp" alt="Warm film grade" loading="lazy" decoding="async"></div>
+      <figcaption><b>Warm film</b><span class="muted">Home, food, nostalgia. Lifted blacks, fine grain.</span><code>curves=all='0/0.06 0.5/0.5 1/0.95',colorbalance=rs=0.05:bs=-0.05:rh=0.04:bh=-0.03,eq=saturation=0.88,noise=alls=7:allf=t+u</code></figcaption></figure>
+    <figure class="demo"><div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer top" src="img/g-teal.webp" alt="Teal and orange grade" loading="lazy" decoding="async"></div>
+      <figcaption><b>Teal and orange</b><span class="muted">Travel, outdoors. Turns black clothes navy.</span><code>colorbalance=rs=-0.08:bs=0.09:rm=-0.03:bm=0.04:rh=0.10:gh=0.02:bh=-0.10,eq=saturation=1.06</code></figcaption></figure>
+    <figure class="demo"><div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer top" src="img/g-matte.webp" alt="Faded matte grade" loading="lazy" decoding="async"></div>
+      <figcaption><b>Faded matte</b><span class="muted">Calm, moody, minimal.</span><code>curves=all='0/0.14 0.6/0.58 1/0.88',eq=saturation=0.72,colorbalance=bs=0.05:bm=0.03</code></figcaption></figure>
+    <figure class="demo"><div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer top" src="img/g-golden.webp" alt="Golden hour grade" loading="lazy" decoding="async"></div>
+      <figcaption><b>Golden hour</b><span class="muted">Cosy, evening. Warm, a soft vignette.</span><code>colortemperature=temperature=4200:mix=0.5,eq=contrast=1.06:saturation=1.12:gamma=0.97,vignette=PI/5</code></figcaption></figure>
+    <figure class="demo"><div class="frame"><img class="layer" src="img/baker.webp" alt="" loading="lazy" decoding="async"><img class="layer top" src="img/g-mono.webp" alt="Black and white grade" loading="lazy" decoding="async"></div>
+      <figcaption><b>Black and white</b><span class="muted">A flashback or a quote, briefly.</span><code>hue=s=0,curves=preset=increase_contrast</code></figcaption></figure>
+  </div>
+  <div class="codebox"><pre><code>ffmpeg -i cut.mp4 -vf "format=gbrp,LOOK,format=yuv420p,setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=tv" \
+    -c:v libx264 -preset slow -crf 15 -c:a copy graded.mp4</code></pre></div>
+  <p class="muted" style="font-size:0.88rem">Tested on ffmpeg 8.1: grading in RGB (<code>gbrp</code>) keeps colours on BT.709-tagged input, so conform first. A LUT goes in place of LOOK as <code>lut3d=file=look.cube:interp=tetrahedral</code>; one built for log footage (Apple Log, S-Log3) overcooks ordinary clips, and iPhone Apple Log needs Apple’s Log-to-Rec.709 LUT first. In Remotion, a CSS <code>filter</code> on the footage is a quick stand-in.</p>
+</section>
+
+<!-- SAFE ZONES -->
+<section id="zones">
+  <div class="sec-head">
+    <span class="eyebrow">Step 6 · Layer</span>
+    <h2>Safe zones</h2>
+    <p class="muted">Each app’s feed drawn to scale on a 1080 by 1920 frame, with the box where text stays clear of its buttons and captions. Icons are simplified; positions follow 2026-10 measurements. The white sample text sits in the shared box, so it clears all three. No platform publishes organic figures and the UIs move, so re-measure from a phone screen recording each quarter. The last three show the tighter boxes for Stories and ads and for Pinterest, and how profile grids crop a cover.</p>
+  </div>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5C7 17 2.5 13.3 2.5 8.9 2.5 6 4.7 3.8 7.4 3.8c1.8 0 3.5 1 4.6 2.6 1.1-1.6 2.8-2.6 4.6-2.6 2.7 0 4.9 2.2 4.9 5.1 0 4.4-4.5 8.1-9.5 11.6z"/></symbol>
+      <symbol id="i-heart-o" viewBox="0 0 24 24"><path d="M12 20.5C7 17 2.5 13.3 2.5 8.9 2.5 6 4.7 3.8 7.4 3.8c1.8 0 3.5 1 4.6 2.6 1.1-1.6 2.8-2.6 4.6-2.6 2.7 0 4.9 2.2 4.9 5.1 0 4.4-4.5 8.1-9.5 11.6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+      <symbol id="i-comment" viewBox="0 0 24 24"><path d="M12 3C6.5 3 2.5 6.6 2.5 11c0 2.4 1.2 4.6 3.2 6.1L5 21l4.2-2.3c.9.2 1.8.3 2.8.3 5.5 0 9.5-3.6 9.5-8S17.5 3 12 3z"/><g fill="#000" fill-opacity="0.35"><circle cx="7.8" cy="11" r="1.3"/><circle cx="12" cy="11" r="1.3"/><circle cx="16.2" cy="11" r="1.3"/></g></symbol>
+      <symbol id="i-bubble" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 4.4 16.9L21 21l-1.2-4.4A9 9 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+      <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z"/></symbol>
+      <symbol id="i-share" viewBox="0 0 24 24"><path d="M13 4.5v4C6.5 9 3.5 13.5 3 19.5c2-3.3 5.2-5 10-5v4.5l8-7-8-7.5z"/></symbol>
+      <symbol id="i-plane" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M22 3 2 10.5l8 3 3 8L22 3z"/><path d="M10 13.5 22 3"/></g></symbol>
+      <symbol id="i-repost" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4 3 8l4 4"/><path d="M3 8h13a4 4 0 0 1 4 4"/><path d="m17 20 4-4-4-4"/><path d="M21 16H8a4 4 0 0 1-4-4"/></g></symbol>
+      <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></symbol>
+      <symbol id="i-dots-v" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5.5 5.5"/></g></symbol>
+      <symbol id="i-camera" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="3"/><circle cx="12" cy="13" r="4"/><path d="M8 6l1.5-2.5h5L16 6"/></g></symbol>
+      <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-thumb" viewBox="0 0 24 24"><path d="M2 10h4v11H2zM8 21h9.2a2 2 0 0 0 2-1.6l1.6-7A2 2 0 0 0 18.8 10H14l.8-4.2a2 2 0 0 0-1.9-2.4L8 10z"/></symbol>
+      <symbol id="i-thumb-down" viewBox="0 0 24 24"><path transform="rotate(180 12 12)" d="M2 10h4v11H2zM8 21h9.2a2 2 0 0 0 2-1.6l1.6-7A2 2 0 0 0 18.8 10H14l.8-4.2a2 2 0 0 0-1.9-2.4L8 10z"/></symbol>
+      <symbol id="i-remix" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 13.7-5.6"/><path d="M20 12a8 8 0 0 1-13.7 5.6"/><path d="M18 3v4h-4"/><path d="M6 21v-4h4"/></g></symbol>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11 12 3l9 8v10h-6v-6H9v6H3z"/></symbol>
+      <symbol id="i-home-o" viewBox="0 0 24 24"><path d="M3 11 12 3l9 8v10h-6v-6H9v6H3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+      <symbol id="i-friends" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.5 3.2-5.5 6.5-5.5s6 2 6.5 5.5"/><circle cx="17" cy="9" r="2.8"/><path d="M16.5 14.6c2.6.2 4.5 2 5 5"/></g></symbol>
+      <symbol id="i-inbox" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 13h5l1.5 2.5h5L16 13h5"/></g></symbol>
+      <symbol id="i-person" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c.6-4 3.9-6.5 8-6.5s7.4 2.5 8 6.5"/></g></symbol>
+      <symbol id="i-reels" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M3 8.5h18M8 3l3 5.5M13.5 3l3 5.5"/></g><path d="M10 12v6l5-3z"/></symbol>
+      <symbol id="i-shorts" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.2 9v6l4.8-3z"/></symbol>
+      <symbol id="i-plus-c" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.5v9M7.5 12h9"/></g></symbol>
+      <symbol id="i-subs" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M5 5h14M7 2h10"/></g><path d="M10 11.5v6l5-3z"/></symbol>
+      <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
+    </defs>
+  </svg>
+  <div class="row" role="group" aria-label="Show in the mocks">
+    <button class="btn" type="button" aria-pressed="true" data-zone="ui">App UI</button>
+    <button class="btn" type="button" aria-pressed="true" data-zone="box">Text box</button>
+    <button class="btn" type="button" aria-pressed="true" data-zone="sample">Sample text</button>
+  </div>
+  <div class="zones" id="zone-figs">
+
+    <!-- TikTok -->
+    <figure class="zone-fig">
+      <svg viewBox="0 0 1080 1920" role="img" aria-label="TikTok For You feed over the baker photo, with its text box">
+        <defs><clipPath id="zt"><rect width="1080" height="1920" rx="44"/></clipPath></defs>
+        <g clip-path="url(#zt)">
+          <image href="img/baker.webp" width="1080" height="1920" preserveAspectRatio="xMidYMid slice"/>
+          <g class="box"><rect x="44" y="130" width="896" height="1306" fill="var(--z-tiktok)" fill-opacity="0.16" stroke="var(--z-tiktok)" stroke-width="7" stroke-dasharray="26 13"/></g>
+          <g class="ui">
+            <text x="72" y="56" font-size="32" font-weight="700">9:41</text>
+            <rect x="874" y="44" width="8" height="12" rx="2"/><rect x="886" y="39" width="8" height="17" rx="2"/><rect x="898" y="34" width="8" height="22" rx="2"/>
+            <rect x="944" y="32" width="54" height="26" rx="7" fill="none" stroke="currentColor" stroke-width="3"/><rect x="949" y="37" width="38" height="16" rx="3"/>
+            <rect x="40" y="82" width="78" height="44" rx="9" fill="none" stroke="currentColor" stroke-width="4"/>
+            <text x="79" y="113" font-size="22" font-weight="700" text-anchor="middle">LIVE</text>
+            <text x="430" y="114" font-size="38" font-weight="700" text-anchor="middle" class="dim">Following</text>
+            <text x="652" y="114" font-size="38" font-weight="700" text-anchor="middle">For You</text>
+            <rect x="622" y="126" width="60" height="6" rx="3"/>
+            <use href="#i-search" x="976" y="74" width="60" height="60"/>
+            <circle cx="1000" cy="905" r="50" fill="#8A6A55" stroke="currentColor" stroke-width="4"/>
+            <circle cx="1000" cy="955" r="20" fill="#FE2C55"/>
+            <path d="M990 955h20M1000 945v20" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+            <use href="#i-heart" x="956" y="1014" width="88" height="88"/>
+            <text x="1000" y="1134" font-size="28" font-weight="700" text-anchor="middle">12.4K</text>
+            <use href="#i-comment" x="958" y="1162" width="84" height="84"/>
+            <text x="1000" y="1278" font-size="28" font-weight="700" text-anchor="middle">318</text>
+            <use href="#i-bookmark" x="962" y="1306" width="76" height="76"/>
+            <text x="1000" y="1414" font-size="28" font-weight="700" text-anchor="middle">1,204</text>
+            <use href="#i-share" x="958" y="1442" width="84" height="84"/>
+            <text x="1000" y="1558" font-size="28" font-weight="700" text-anchor="middle">87</text>
+            <circle cx="1000" cy="1650" r="42" fill="#1A1A1A" stroke="#3A3A3A" stroke-width="12"/><circle cx="1000" cy="1650" r="17" fill="#8A6A55"/>
+            <text x="40" y="1494" font-size="38" font-weight="700">chockstone.bakes</text>
+            <text x="40" y="1550" font-size="33" font-weight="500">my best loaf yet, twelve hours start</text>
+            <text x="40" y="1594" font-size="33" font-weight="500">to finish #sourdough #baking <tspan font-weight="700">more</tspan></text>
+            <use href="#i-music" x="40" y="1636" width="34" height="34"/>
+            <text x="86" y="1664" font-size="30" font-weight="500">original sound - chockstone.bakes</text>
+            <rect class="navbar" x="0" y="1790" width="1080" height="130"/>
+            <use href="#i-home" x="82" y="1808" width="52" height="52"/><text x="108" y="1894" font-size="24" font-weight="700" text-anchor="middle">Home</text>
+            <use href="#i-friends" x="298" y="1808" width="52" height="52" class="dim"/><text x="324" y="1894" font-size="24" text-anchor="middle" class="dim">Friends</text>
+            <rect x="484" y="1814" width="96" height="62" rx="16" fill="#25F4EE"/><rect x="500" y="1814" width="96" height="62" rx="16" fill="#FE2C55"/>
+            <rect x="492" y="1814" width="96" height="62" rx="16" fill="#FFFFFF"/><path d="M540 1829v32M524 1845h32" stroke="#000000" stroke-width="7" stroke-linecap="round"/>
+            <use href="#i-inbox" x="730" y="1808" width="52" height="52" class="dim"/><text x="756" y="1894" font-size="24" text-anchor="middle" class="dim">Inbox</text>
+            <use href="#i-person" x="946" y="1808" width="52" height="52" class="dim"/><text x="972" y="1894" font-size="24" text-anchor="middle" class="dim">Profile</text>
+          </g>
+          <text class="sample-txt" x="490" y="370" font-size="76" text-anchor="middle">my best loaf yet</text>
+          <text class="sample-txt" x="490" y="1384" font-size="58" text-anchor="middle">twelve hours, four steps</text>
+        </g>
+        <rect x="3" y="3" width="1074" height="1914" rx="42" fill="none" stroke="var(--line)" stroke-width="6"/>
+      </svg>
+      <figcaption class="legend">
+        <b>TikTok</b>
+        <span><span class="sw" style="border:2px dashed var(--z-tiktok)"></span>Text box x 44-940, y 130-1436</span>
+        <span>Tabs end at y 130. The button rail takes x 940 to the edge from y 840. The name and caption start at y 1436 and grow upward when the caption runs long.</span>
+      </figcaption>
+    </figure>
+
+    <!-- Reels -->
+    <figure class="zone-fig">
+      <svg viewBox="0 0 1080 1920" role="img" aria-label="Instagram Reels over the baker photo, with its text box">
+        <defs><clipPath id="zr"><rect width="1080" height="1920" rx="44"/></clipPath></defs>
+        <g clip-path="url(#zr)">
+          <image href="img/baker.webp" width="1080" height="1920" preserveAspectRatio="xMidYMid slice"/>
+          <g class="box">
+            <rect x="86" y="250" width="874" height="1350" fill="var(--z-reels)" fill-opacity="0.16" stroke="var(--z-reels)" stroke-width="7" stroke-dasharray="26 13"/>
+            <rect x="65" y="269" width="950" height="979" fill="none" stroke="var(--z-reels)" stroke-width="4" stroke-dasharray="4 10"/>
+          </g>
+          <g class="ui">
+            <text x="72" y="56" font-size="32" font-weight="700">9:41</text>
+            <rect x="874" y="44" width="8" height="12" rx="2"/><rect x="886" y="39" width="8" height="17" rx="2"/><rect x="898" y="34" width="8" height="22" rx="2"/>
+            <rect x="944" y="32" width="54" height="26" rx="7" fill="none" stroke="currentColor" stroke-width="3"/><rect x="949" y="37" width="38" height="16" rx="3"/>
+            <text x="48" y="168" font-size="54" font-weight="700">Reels</text>
+            <use href="#i-chevron" x="196" y="130" width="40" height="40"/>
+            <use href="#i-camera" x="974" y="118" width="62" height="62"/>
+            <use href="#i-heart-o" x="978" y="1240" width="64" height="64"/>
+            <text x="1010" y="1336" font-size="26" font-weight="600" text-anchor="middle">12.4K</text>
+            <use href="#i-bubble" x="978" y="1352" width="64" height="64"/>
+            <text x="1010" y="1448" font-size="26" font-weight="600" text-anchor="middle">318</text>
+            <use href="#i-repost" x="978" y="1464" width="64" height="64"/>
+            <text x="1010" y="1560" font-size="26" font-weight="600" text-anchor="middle">41</text>
+            <use href="#i-plane" x="978" y="1576" width="64" height="64"/>
+            <text x="1010" y="1672" font-size="26" font-weight="600" text-anchor="middle">87</text>
+            <use href="#i-dots" x="986" y="1682" width="48" height="48"/>
+            <rect x="982" y="1734" width="56" height="56" rx="12" fill="#8A6A55" stroke="currentColor" stroke-width="4"/>
+            <circle cx="80" cy="1640" r="30" fill="#8A6A55" stroke="currentColor" stroke-width="3"/>
+            <text x="126" y="1651" font-size="32" font-weight="700">chockstone.bakes</text>
+            <rect x="434" y="1614" width="122" height="50" rx="12" fill="none" stroke="currentColor" stroke-width="3"/>
+            <text x="495" y="1648" font-size="27" font-weight="700" text-anchor="middle">Follow</text>
+            <text x="48" y="1712" font-size="30" font-weight="500">my best loaf yet, twelve hours start… <tspan class="dim">more</tspan></text>
+            <use href="#i-music" x="48" y="1734" width="28" height="28"/>
+            <text x="86" y="1757" font-size="26" font-weight="500">chockstone.bakes · Original audio</text>
+            <rect class="navbar" x="0" y="1800" width="1080" height="120"/>
+            <use href="#i-home-o" x="80" y="1832" width="56" height="56"/>
+            <use href="#i-reels" x="296" y="1832" width="56" height="56"/>
+            <use href="#i-plane" x="512" y="1832" width="56" height="56"/>
+            <use href="#i-search" x="728" y="1832" width="56" height="56"/>
+            <circle cx="972" cy="1860" r="27" fill="#8A6A55" stroke="currentColor" stroke-width="3"/>
+          </g>
+          <text class="sample-txt" x="490" y="370" font-size="76" text-anchor="middle">my best loaf yet</text>
+          <text class="sample-txt" x="490" y="1384" font-size="58" text-anchor="middle">twelve hours, four steps</text>
+        </g>
+        <rect x="3" y="3" width="1074" height="1914" rx="42" fill="none" stroke="var(--line)" stroke-width="6"/>
+      </svg>
+      <figcaption class="legend">
+        <b>Instagram Reels</b>
+        <span><span class="sw" style="border:2px dashed var(--z-reels)"></span>Text box x 86-960, y 250-1600</span>
+        <span><span class="sw" style="border:2px dotted var(--z-reels)"></span>Ads: Meta’s 14% top, 35% bottom, 6% sides</span>
+        <span>The header ends near y 250. The rail takes x 960 to the edge from y 1240. Name, Follow, caption and audio start at y 1600.</span>
+      </figcaption>
+    </figure>
+
+    <!-- Shorts -->
+    <figure class="zone-fig">
+      <svg viewBox="0 0 1080 1920" role="img" aria-label="YouTube Shorts over the baker photo, with its text box">
+        <defs><clipPath id="zs"><rect width="1080" height="1920" rx="44"/></clipPath></defs>
+        <g clip-path="url(#zs)">
+          <image href="img/baker.webp" width="1080" height="1920" preserveAspectRatio="xMidYMid slice"/>
+          <g class="box">
+            <rect x="48" y="288" width="840" height="1162" fill="var(--z-shorts)" fill-opacity="0.16" stroke="var(--z-shorts)" stroke-width="5" stroke-dasharray="26 13"/>
+            <rect x="48" y="288" width="840" height="960" fill="none" stroke="var(--z-shorts)" stroke-width="7"/>
+          </g>
+          <g class="ui">
+            <text x="72" y="56" font-size="32" font-weight="700">9:41</text>
+            <rect x="874" y="44" width="8" height="12" rx="2"/><rect x="886" y="39" width="8" height="17" rx="2"/><rect x="898" y="34" width="8" height="22" rx="2"/>
+            <rect x="944" y="32" width="54" height="26" rx="7" fill="none" stroke="currentColor" stroke-width="3"/><rect x="949" y="37" width="38" height="16" rx="3"/>
+            <use href="#i-search" x="850" y="104" width="62" height="62"/>
+            <use href="#i-dots-v" x="986" y="104" width="62" height="62"/>
+            <g fill="#000000" fill-opacity="0.3"><circle cx="1000" cy="1046" r="48"/><circle cx="1000" cy="1176" r="48"/><circle cx="1000" cy="1306" r="48"/><circle cx="1000" cy="1436" r="48"/><circle cx="1000" cy="1566" r="48"/></g>
+            <use href="#i-thumb" x="970" y="1016" width="60" height="60"/>
+            <text x="1000" y="1122" font-size="26" font-weight="600" text-anchor="middle">12K</text>
+            <use href="#i-thumb-down" x="970" y="1146" width="60" height="60"/>
+            <text x="1000" y="1252" font-size="26" font-weight="600" text-anchor="middle">Dislike</text>
+            <use href="#i-comment" x="970" y="1276" width="60" height="60"/>
+            <text x="1000" y="1382" font-size="26" font-weight="600" text-anchor="middle">318</text>
+            <use href="#i-share" x="970" y="1406" width="60" height="60"/>
+            <text x="1000" y="1512" font-size="26" font-weight="600" text-anchor="middle">Share</text>
+            <use href="#i-remix" x="970" y="1536" width="60" height="60"/>
+            <text x="1000" y="1642" font-size="26" font-weight="600" text-anchor="middle">Remix</text>
+            <rect x="970" y="1672" width="60" height="60" rx="10" fill="#8A6A55" stroke="currentColor" stroke-width="4"/>
+            <circle cx="78" cy="1558" r="30" fill="#8A6A55"/>
+            <text x="122" y="1569" font-size="32" font-weight="700">@chockstone.bakes</text>
+            <rect x="446" y="1528" width="168" height="60" rx="30" fill="#FFFFFF"/>
+            <text x="530" y="1568" font-size="27" font-weight="700" fill="#0F0F0F" text-anchor="middle">Subscribe</text>
+            <text x="48" y="1646" font-size="32" font-weight="500">my best loaf yet, twelve hours start to</text>
+            <text x="48" y="1688" font-size="32" font-weight="500">finish #shorts #sourdough</text>
+            <use href="#i-music" x="48" y="1716" width="28" height="28"/>
+            <text x="86" y="1740" font-size="26" font-weight="500">Original sound · chockstone.bakes</text>
+            <rect x="0" y="1792" width="1080" height="6" fill="#FFFFFF" fill-opacity="0.35"/><rect x="0" y="1792" width="420" height="6" fill="#FF0033"/>
+            <rect class="navbar" x="0" y="1798" width="1080" height="122"/>
+            <use href="#i-home-o" x="84" y="1816" width="48" height="48"/><text x="108" y="1894" font-size="22" text-anchor="middle">Home</text>
+            <use href="#i-shorts" x="300" y="1816" width="48" height="48"/><text x="324" y="1894" font-size="22" font-weight="700" text-anchor="middle">Shorts</text>
+            <use href="#i-plus-c" x="508" y="1822" width="64" height="64"/>
+            <use href="#i-subs" x="732" y="1816" width="48" height="48"/><text x="756" y="1894" font-size="22" text-anchor="middle">Subscriptions</text>
+            <use href="#i-person" x="948" y="1816" width="48" height="48"/><text x="972" y="1894" font-size="22" text-anchor="middle">You</text>
+          </g>
+          <text class="sample-txt" x="490" y="370" font-size="76" text-anchor="middle">my best loaf yet</text>
+          <text class="sample-txt" x="490" y="1384" font-size="58" text-anchor="middle">twelve hours, four steps</text>
+        </g>
+        <rect x="3" y="3" width="1074" height="1914" rx="42" fill="none" stroke="var(--line)" stroke-width="6"/>
+      </svg>
+      <figcaption class="legend">
+        <b>YouTube Shorts</b>
+        <span><span class="sw" style="border:2px solid var(--z-shorts)"></span>Google’s box x 48-888, y 288-1248</span>
+        <span><span class="sw" style="border:2px dashed var(--z-shorts)"></span>Organic bottom, estimated: y 1450</span>
+        <span>The rail takes x 950 to the edge from y 1000. The channel row and title start near y 1500.</span>
+      </figcaption>
+    </figure>
+
+    <!-- Shared -->
+    <figure class="zone-fig">
+      <svg viewBox="0 0 1080 1920" role="img" aria-label="The skill's shared text box over the baker photo">
+        <defs><clipPath id="zx"><rect width="1080" height="1920" rx="44"/></clipPath></defs>
+        <g clip-path="url(#zx)">
+          <image href="img/baker.webp" width="1080" height="1920" preserveAspectRatio="xMidYMid slice"/>
+          <g class="box">
+            <rect x="44" y="130" width="896" height="1306" fill="none" stroke="var(--z-tiktok)" stroke-width="5" stroke-dasharray="26 13"/>
+            <rect x="86" y="250" width="874" height="1350" fill="none" stroke="var(--z-reels)" stroke-width="5" stroke-dasharray="6 10"/>
+            <rect x="48" y="288" width="840" height="1162" fill="none" stroke="var(--z-shorts)" stroke-width="5"/>
+            <rect x="90" y="290" width="800" height="1110" fill="var(--zone)" fill-opacity="0.2" stroke="var(--zone)" stroke-width="8"/>
+            <rect x="90" y="290" width="800" height="130" fill="var(--zone)" fill-opacity="0.35"/>
+            <rect x="90" y="1240" width="800" height="160" fill="var(--zone)" fill-opacity="0.35"/>
+          </g>
+          <text class="sample-txt" x="490" y="370" font-size="76" text-anchor="middle">my best loaf yet</text>
+          <text class="sample-txt" x="490" y="1384" font-size="58" text-anchor="middle">twelve hours, four steps</text>
+        </g>
+        <rect x="3" y="3" width="1074" height="1914" rx="42" fill="none" stroke="var(--line)" stroke-width="6"/>
+      </svg>
+      <figcaption class="legend">
+        <b>The skill’s shared box</b>
+        <span><span class="sw" style="background:var(--zone);opacity:.6"></span>x 90-890, y 290-1400: clear in all three apps</span>
+        <span><span class="sw" style="background:var(--zone)"></span>Hook’s top edge at y 290-420; captions’ bottom edge at most y 1400</span>
+        <span>Ads on all three: x 120-888, y 288-1248. <code>place.py</code>, <code>CalmText</code> and <code>PhraseCaptions</code> default to the organic box.</span>
+      </figcaption>
+    </figure>
+
+    <!-- Stories, Pinterest, grid -->
+    <figure class="zone-fig">
+      <svg viewBox="0 0 1080 1920" role="img" aria-label="Meta's Stories and Reels ads box over the baker photo">
+        <defs><clipPath id="zs"><rect width="1080" height="1920" rx="44"/></clipPath></defs>
+        <g clip-path="url(#zs)">
+          <image href="img/baker.webp" width="1080" height="1920" preserveAspectRatio="xMidYMid slice"/>
+          <g class="box">
+            <rect x="65" y="269" width="950" height="979" fill="var(--z-stories)" fill-opacity="0.16" stroke="var(--z-stories)" stroke-width="7" stroke-dasharray="26 13"/>
+            <rect x="120" y="288" width="768" height="960" fill="none" stroke="var(--zone)" stroke-width="5"/>
+          </g>
+          <text class="sample-txt" x="504" y="370" font-size="72" text-anchor="middle">my best loaf yet</text>
+          <text class="sample-txt" x="504" y="1222" font-size="52" text-anchor="middle">twelve hours, four steps</text>
+        </g>
+        <rect x="3" y="3" width="1074" height="1914" rx="42" fill="none" stroke="var(--line)" stroke-width="6"/>
+      </svg>
+      <figcaption class="legend">
+        <b>Stories and Reels ads</b>
+        <span><span class="sw" style="border:2px dashed var(--z-stories)"></span>Meta’s box: x 65-1015, y 269-1248 (14% off the top, 35% off the bottom)</span>
+        <span><span class="sw" style="border:2px solid var(--zone)"></span>Ads on all three apps: x 120-888, y 288-1248</span>
+        <span class="muted">An ad keeps captions above y 1248, where the call-to-action button sits.</span>
+      </figcaption>
+    </figure>
+
+    <figure class="zone-fig">
+      <svg viewBox="0 0 1080 1920" role="img" aria-label="Pinterest video Pin text box over the baker photo">
+        <defs><clipPath id="zp"><rect width="1080" height="1920" rx="44"/></clipPath></defs>
+        <g clip-path="url(#zp)">
+          <image href="img/baker.webp" width="1080" height="1920" preserveAspectRatio="xMidYMid slice"/>
+          <g class="box"><rect x="65" y="270" width="820" height="860" fill="var(--z-pin)" fill-opacity="0.16" stroke="var(--z-pin)" stroke-width="7" stroke-dasharray="26 13"/></g>
+          <text class="sample-txt" x="475" y="370" font-size="72" text-anchor="middle">my best loaf yet</text>
+          <text class="sample-txt" x="475" y="1100" font-size="52" text-anchor="middle">twelve hours, four steps</text>
+        </g>
+        <rect x="3" y="3" width="1074" height="1914" rx="42" fill="none" stroke="var(--line)" stroke-width="6"/>
+      </svg>
+      <figcaption class="legend">
+        <b>Pinterest video Pin</b>
+        <span><span class="sw" style="border:2px dashed var(--z-pin)"></span>x 65-885, y 270-1130</span>
+        <span class="muted">The highest bottom edge of any app: a video bound for Pinterest sets its captions in this box, not the shared one.</span>
+      </figcaption>
+    </figure>
+
+    <figure class="zone-fig">
+      <svg viewBox="0 0 1080 1920" role="img" aria-label="How profile grids crop a cover">
+        <defs><clipPath id="zg"><rect width="1080" height="1920" rx="44"/></clipPath></defs>
+        <g clip-path="url(#zg)">
+          <image href="img/baker.webp" width="1080" height="1920" preserveAspectRatio="xMidYMid slice"/>
+          <g class="box">
+            <rect x="0" y="0" width="1080" height="240" fill="var(--scrim)" opacity="0.55"/>
+            <rect x="0" y="1680" width="1080" height="240" fill="var(--scrim)" opacity="0.55"/>
+            <rect x="5" y="240" width="1070" height="1440" fill="none" stroke="var(--z-grid)" stroke-width="8" stroke-dasharray="26 13"/>
+            <rect x="18" y="285" width="1044" height="1350" fill="none" stroke="var(--z-reels)" stroke-width="5" stroke-dasharray="6 10"/>
+            <rect x="60" y="300" width="960" height="1320" fill="var(--zone)" fill-opacity="0.14" stroke="var(--zone)" stroke-width="6"/>
+          </g>
+          <text class="sample-txt" x="540" y="430" font-size="96" text-anchor="middle">best loaf yet</text>
+        </g>
+        <rect x="3" y="3" width="1074" height="1914" rx="42" fill="none" stroke="var(--line)" stroke-width="6"/>
+      </svg>
+      <figcaption class="legend">
+        <b>Grid crops of a cover</b>
+        <span><span class="sw" style="border:2px dashed var(--z-grid)"></span>Instagram grid, 3:4 since January 2025: y 240-1680</span>
+        <span><span class="sw" style="border:2px dashed var(--z-reels)"></span>A Reel in the Instagram feed, 4:5: y 285-1635</span>
+        <span><span class="sw" style="background:var(--zone);opacity:.6"></span>Keep cover text and the face in y 300-1620; TikTok’s grid is about 3:4 (centring unconfirmed)</span>
+      </figcaption>
+    </figure>
+
+    <!-- Chockstone -->
+    <figure class="zone-fig">
+      <svg viewBox="0 0 1080 1920" role="img" aria-label="Chockstone zones for all networks">
+        <defs><clipPath id="zc2"><rect width="1080" height="1920" rx="44"/></clipPath></defs>
+        <g clip-path="url(#zc2)">
+          <image href="img/baker.webp" width="1080" height="1920" preserveAspectRatio="xMidYMid slice"/>
+          <rect x="0" y="0" width="1080" height="240" fill="var(--scrim)" opacity="0.55"/>
+          <rect x="0" y="1450" width="1080" height="470" fill="var(--scrim)" opacity="0.55"/>
+          <rect x="880" y="864" width="200" height="586" fill="var(--scrim)" opacity="0.55"/>
+          <rect x="65" y="240" width="950" height="182" fill="var(--z-reels)" opacity="0.4"/>
+          <rect x="65" y="1152" width="815" height="298" fill="var(--zone)" opacity="0.45"/>
+          <line x1="65" y1="0" x2="65" y2="1920" stroke="var(--cap)" stroke-width="4" stroke-dasharray="10 10"/>
+          <line x1="1015" y1="0" x2="1015" y2="1920" stroke="var(--cap)" stroke-width="4" stroke-dasharray="10 10"/>
+        </g>
+        <rect x="3" y="3" width="1074" height="1914" rx="42" fill="none" stroke="var(--line)" stroke-width="6"/>
+      </svg>
+      <figcaption class="legend">
+        <b>Chockstone, all networks</b>
+        <span><span class="sw" style="background:var(--z-reels);opacity:.6"></span>Title band: 12.5-22% down (y 240-422)</span>
+        <span><span class="sw" style="background:var(--zone);opacity:.7"></span>Caption band: 60-75.5% down (y 1152-1450)</span>
+        <span><span class="sw" style="background:var(--scrim);opacity:.6"></span>App UI: top 12.5%, bottom 24.5%, a button rail 18.5% wide; 6% side margins</span>
+        <span class="muted">The band’s last 14 px pass TikTok’s caption block (y 1436), so a two-line caption should end by y 1400.</span>
+      </figcaption>
+    </figure>
+  </div>
+  <p class="muted" style="font-size:0.88rem">On taller phones the apps’ tab bars sit below the video; on 16:9 phones they cover its bottom 120-130 px, as drawn.</p>
+</section>
+
+<!-- REPAIR -->
+<section id="repair">
+  <div class="sec-head">
+    <span class="eyebrow">Steps 1 and 9 · Intake and delivery</span>
+    <h2>Repair and privacy</h2>
+    <p class="muted">Fixes for footage that arrived wrong, then the two checks before a video leaves: nothing private on screen, and a cover that holds up on the profile grid. The Apple Vision tools run on the Mac; nothing is uploaded.</p>
+  </div>
+  <div class="grid" style="--min: 320px">
+    <div class="panel"><h3>Reframe 16:9 to 9:16</h3>
+      <svg class="diagram" viewBox="0 0 520 310" role="img" aria-label="A 9:16 crop window following a face across a 16:9 frame">
+        <defs><marker id="ah-reframe" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker></defs>
+        <rect x="20" y="20" width="480" height="270" rx="6" fill="var(--soft)" stroke="var(--line)" stroke-width="2"/>
+        <circle cx="226" cy="118" r="24" fill="var(--muted)" fill-opacity="0.5"/><path d="M186 290V214Q226 160 266 214V290Z" fill="var(--muted)" fill-opacity="0.5"/>
+        <circle cx="376" cy="118" r="24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 5"/><path d="M336 290V214Q376 160 416 214V290" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 5"/>
+        <rect x="150" y="20" width="152" height="270" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="3"/>
+        <rect x="300" y="20" width="152" height="270" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 6"/>
+        <path d="M240 60H350" stroke="var(--accent)" stroke-width="2.5" marker-end="url(#ah-reframe)"/>
+        <text x="30" y="276">16:9 source</text><text class="lbl" x="160" y="40">9:16 crop</text>
+      </svg>
+      <p><code>reframe.py wide.mp4 work/tall.mp4</code> follows the biggest face: still while it stays near centre, an eased move when it shifts, a jump at a cut. A 1080p source cropped to vertical is 608 px wide and upscales 1.8x, so shoot 4K when the edit will reframe. Two people: one reframe each, or a split screen.</p>
+    </div>
+    <div class="panel"><h3>Shaky, grainy or mismatched</h3>
+      <dl class="spec">
+        <dt>--stabilize</dt><dd>smooths handheld at intake (<code>edl.py conform</code>); crops 4%</dd>
+        <dt>--denoise light</dt><dd>grain in low light; <code>strong</code> is slower</dd>
+        <dt>match.py</dt><dd>prints a <code>grade</code> that matches a second phone or take, read from a region on the face</dd>
+        <dt>--scopes DIR</dt><dd><code>edl.py qa</code> writes each segment beside its waveform and vectorscope</dd>
+        <dt>sync.py</dt><dd>lines up two phones from one clap; confidence over 1.5 is a sure match</dd>
+      </dl>
+    </div>
+  </div>
+  <div class="grid" style="--min: 320px">
+    <div class="panel"><h3>Privacy blur</h3>
+      <ol class="steps">
+        <li><code>redact.py final.mp4 out.mp4 --dry-run --sheet work/regions.jpg &gt; work/regions.json</code> finds addresses, phone numbers, emails, barcodes and long numbers on screen and boxes each on one sheet.</li>
+        <li>Look at the sheet. A region marked <b>unsure</b> was never read with full confidence. Vision rates every line 0.3, 0.5 or 1.0, and upside-down packaging print or curved embroidery comes back as garbage at 0.3-0.5.</li>
+        <li>Every unsure region is print: render with <code>--sure-only</code>. Otherwise delete the false ones from the JSON and render with <code>--regions work/regions.json</code>.</li>
+        <li>What OCR missed (handwriting, sideways or tiny print): <code>--box x0,y0,x1,y1@T0-T1</code>; a thing that moves: <code>--track</code>; a fast pan: <code>--step 1</code>.</li>
+        <li>Watch the result. <code>--style box</code> is the only cover nothing can undo; blurred text can sometimes be read back.</li>
+      </ol>
+      <p class="muted">Tested on a real mail unboxing: all nine regions it flagged were unsure packaging and hat print, and the sheet showed that in one look. Address patterns are US and UK.</p>
+    </div>
+    <div class="panel"><h3>Cover</h3>
+      <p><code>cover.py work/graded.mp4 renders/cover.jpg --json work/cover.json --top 6 work/covers.jpg</code> runs on the graded cut before captions, since half a caption reads badly on a grid.</p>
+      <dl class="spec">
+        <dt>drops</dt><dd>eyes shut or lowered, a head looking down, blurred frames</dd>
+        <dt>ranks</dt><dd>by Apple Vision’s aesthetics score; writes the best and a sheet of the next five</dd>
+        <dt>title_box</dt><dd>the band of the 3:4 grid crop clear of every face, for a cover title</dd>
+      </dl>
+      <p>Upload it as the custom cover. Pick from the sheet when the top frame is not the story’s moment.</p>
+    </div>
+  </div>
+</section>
+
+<!-- QA -->
+<section id="qa">
+  <div class="sec-head">
+    <span class="eyebrow">Step 9 · QA</span>
+    <h2>Reading the QA report</h2>
+    <p class="muted"><code>edl.py qa work/edit.json renders/final.mp4 --sheet work/qa.jpg</code> exits 1 on any error. The sheet holds the frame just after every cut, transition and cutaway edge, plus the first and last. On macOS it also reads the text on screen every half second and measures levels; <code>--allow WORD</code> passes a brand’s own URL or name. Every error is fixed in code and re-rendered, never sent to the person as a question.</p>
+  </div>
+  <div class="scroll"><table><thead><tr><th>Line</th><th>Level</th><th>Meaning and fix</th></tr></thead><tbody>
+<tr><td>Codec, pixel format, size or fps unlike the EDL</td><td><span class="tag warn">error</span></td><td>Re-render from the EDL with <code>edl.py render</code></td></tr>
+<tr><td>Missing BT.709 tags</td><td><span class="tag warn">error</span></td><td>Primaries, transfer and matrix all tagged; <code>edl.py render</code> does it, hand-written ffmpeg often does not</td></tr>
+<tr><td>Frame count unlike the EDL’s timeline</td><td><span class="tag warn">error</span></td><td>A dropped or doubled frame: <code>edl.py check</code>, then re-render</td></tr>
+<tr><td>Audio not AAC 48 kHz stereo</td><td><span class="tag warn">error</span></td><td>Re-render; the master is AAC 48 kHz stereo at 320 kbps</td></tr>
+<tr><td>Audio more than 0.05 s off the picture</td><td><span class="tag warn">error</span></td><td>A variable-rate source, or audio cut without its picture: conform at intake</td></tr>
+<tr><td>moov after mdat</td><td><span class="tag warn">error</span></td><td><code>-movflags +faststart</code></td></tr>
+<tr><td>Loudness more than 0.5 LU off target, or true peak over it</td><td><span class="tag warn">error</span></td><td><code>master.py</code> again; <code>--no-loudness</code> for a voice-only draft</td></tr>
+<tr><td><code>another app's watermark or credit</code></td><td><span class="tag warn">error</span></td><td>A line reading only TikTok, CapCut or "Made with ...": re-export the source without it, or cover it</td></tr>
+<tr><td><code>an email address</code> / <code>a phone number</code> / <code>a street address</code> / <code>a postcode</code> / <code>a tracking number</code> on screen</td><td><span class="tag warn">error</span></td><td>Private details: <code>redact.py</code> (Repair and privacy)</td></tr>
+<tr><td><code>a barcode or QR code</code></td><td><span class="tag">warn</span></td><td>A shipping label's code holds the address: blur it; a product's own code can stay</td></tr>
+<tr><td><code>a price on screen</code></td><td><span class="tag">warn</span></td><td>Fine unless the project forbids prices (Amazon affiliates: never)</td></tr>
+<tr><td><code>a URL on screen</code></td><td><span class="tag">warn</span></td><td>Check it is the person's or the brand's; never a link shortener</td></tr>
+<tr><td><code>an app name on screen</code></td><td><span class="tag">warn</span></td><td>Fine when it is the point ("TikTok made me buy it"); a leftover watermark is not</td></tr>
+<tr><td><code>highlights clip</code> / <code>shadows crush</code></td><td><span class=muted>note</span></td><td>Over 20% of a segment's frames at the limits: grade.md</td></tr>
+<tr><td><code>segment N is brighter (darker, warmer, cooler) than the shot before</code></td><td><span class=muted>note</span></td><td>Two takes that should match do not: <code>match.py</code></td></tr>
+<tr><td><code>possibly ... (OCR unsure): look at the frame</code></td><td><span class="tag">warn</span></td><td>Vision read it at low confidence: usually upside-down or curved print. Look; a real address still needs <code>redact.py</code></td></tr>
+<tr><td><code>on-screen text not read</code></td><td><span class="tag">warn</span></td><td>Not on macOS, or <code>ocr.swift</code> missing: read the sheet for text by eye</td></tr>
+</tbody></table></div>
+</section>
+
+<!-- NUMBERS -->
+<section id="numbers">
+  <div class="sec-head">
+    <span class="eyebrow">Reference</span>
+    <h2>The numbers it edits by</h2>
+    <p class="muted">Defaults. A project’s own style rules override them, except one: a cut never clips a word.</p>
+  </div>
+  <div class="grid" style="--min: 280px">
+    <div class="panel"><h3>Cutting</h3><dl class="spec">
+      <dt>0.6 s</dt><dd>least a cut must save; shorter pauses play</dd>
+      <dt>2 s</dt><dd>shortest shot between two changes</dd>
+      <dt>2-6 s</dt><dd>cutaway over the voice</dd>
+      <dt>outward</dt><dd>cuts move into quiet, never into a word</dd>
+      <dt>1×</dt><dd>real speed and actions in full, unless the style wants ramps</dd>
+      <dt>8 ms</dt><dd>de-click fade on every audio cut</dd></dl></div>
+    <div class="panel"><h3>Hook, CTA, length</h3><dl class="spec">
+      <dt>frame 0</dt><dd>hook on screen, at most 7 words and 2 lines</dd>
+      <dt>1.5-2.5 s</dt><dd>CTA at the end, off the face</dd>
+      <dt>≤ 3:00</dt><dd>to count as a Short; Reels past 3:00 are not shown to non-followers</dd>
+      <dt>drop lines</dt><dd>to shorten, never tighten pauses</dd></dl></div>
+    <div class="panel"><h3>Audio</h3><dl class="spec">
+      <dt>-14 LUFS</dt><dd>master loudness</dd>
+      <dt>-1 dBTP</dt><dd>true peak ceiling</dd>
+      <dt>15-20 dB</dt><dd>music under the voice, ducked</dd>
+      <dt>-16 LUFS</dt><dd>Chockstone’s own voice clean-up target</dd>
+      <dt>licensed</dt><dd>music and effects; one effect marks one moment</dd></dl></div>
+    <div class="panel"><h3>Render</h3><dl class="spec">
+      <dt>1080×1920</dt><dd>30 fps (or as shot), never changed mid-edit</dd>
+      <dt>CRF 15</dt><dd>H.264 high, preset slow, yuv420p</dd>
+      <dt>BT.709</dt><dd>primaries, transfer and matrix; limited range</dd>
+      <dt>AAC 48k</dt><dd>stereo, 320 kbps</dd>
+      <dt>faststart</dt><dd>moov before mdat</dd>
+      <dt>25 Mbps</dt><dd>Instagram API ceiling (300 MB): re-render at CRF 17-18, never resize</dd></dl></div>
+  </div>
+  <div class="grid" style="--min: 300px">
+    <div class="panel">
+      <h3>Off in the calm style, on when the style asks</h3>
+      <div class="row"><span class="tag">Word highlights</span><span class="tag">Speed ramps</span><span class="tag">Sound effects</span><span class="tag">Stickers and pops</span><span class="tag">Outlines</span><span class="tag">Variants for an A/B test</span></div>
+      <p class="muted">A project’s own rules can switch any of these off for good.</p>
+    </div>
+    <div class="panel">
+      <h3>Never</h3>
+      <div class="row"><span class="tag warn">A word cut off</span><span class="tag warn">Text on a face</span><span class="tag warn">A transition hiding a bad cut</span><span class="tag warn">A smaller re-encode</span><span class="tag warn">Private details on screen</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FILMING -->
+<section id="filming">
+  <div class="sec-head">
+    <span class="eyebrow">Step 0 · Shoot</span>
+    <h2>Filming guide</h2>
+    <p class="muted">What makes the edit possible, in the order people forget it. Hand it over before the shoot.</p>
+  </div>
+  <div class="grid" style="--min: 250px">
+    <div class="panel"><h3>Hold still 3 s</h3><p>Before the first word and after the last of every take, and around every action. Cuts and dissolves need those frames.</p></div>
+    <div class="panel"><h3>10 s of room tone</h3><p>Everyone quiet, camera rolling, at each place you film. It fills every gap in the edit.</p></div>
+    <div class="panel"><h3>Hands-only B-roll</h3><p>Each product in the hand, opened, in use, and the result: 5-10 s each, steady, no talking. Keep addresses out of frame.</p></div>
+    <div class="panel"><h3>Lock the camera</h3><p>Lock exposure and focus (long-press on iPhone) and face the light. 4K when the edit may punch in or reframe; 60 fps for anything that may play slow.</p></div>
+    <div class="panel"><h3>One mic, close</h3><p>A lav, or the phone 50 cm away. No music playing while filming.</p></div>
+    <div class="panel"><h3>Set pieces</h3><p>Text behind a person, a vertigo zoom and green screen need the person in place and the camera locked off. Green screen also wants even light.</p></div>
+    <div class="panel"><h3>Two phones</h3><p>Start both and clap once on camera; <code>sync.py</code> lines them up from the clap.</p></div>
+    <div class="panel"><h3>The hook three ways</h3><p>It is the line most worth having options for.</p></div>
+  </div>
+</section>
+
+<!-- RECIPES -->
+<section id="recipes">
+  <div class="sec-head">
+    <span class="eyebrow">Step 4 · Plan</span>
+    <h2>Recipes by content type</h2>
+    <p class="muted">Beats, footage and tools per kind of video, in the calm style; “energetic” is what to add when the person wants pace. The full recipes are in <code>references/cookbook.md</code>.</p>
+  </div>
+  <div class="grid" style="--min: 300px">
+    <div class="panel"><h3>Haul</h3><dl class="spec"><dt>Open</dt><dd>every item at once with the count, a <code>ListCounter</code> in a corner</dd><dt>Per item</dt><dd>5-10 s: named on the cut to its footage, one reason, a verdict</dd><dt>End</dt><dd>the favourite, then the CTA</dd><dt>Energetic</dt><dd>a sticker per verdict, a pop as each lands, a ramp through unpacking</dd></dl></div>
+    <div class="panel"><h3>Unboxing</h3><dl class="spec"><dt>Open</dt><dd>the product in use for 1-2 s</dd><dt>Body</dt><dd>box, opening, each layer; the first look plays whole with its own sound</dd><dt>Detail</dt><dd>a digital zoom or a callout on what is named</dd><dt>Privacy</dt><dd>blur the shipping label before anything else</dd></dl></div>
+    <div class="panel"><h3>Get ready with me</h3><dl class="spec"><dt>Open</dt><dd>the finished look, then back to the start</dd><dt>Body</dt><dd>each step as it happens; each product held to camera 2 s as it is named</dd><dt>Long steps</dt><dd>an interlude, or drop lines; never sped up in the calm style</dd><dt>End</dt><dd>the look again, held, then the CTA</dd></dl></div>
+    <div class="panel"><h3>Review</h3><dl class="spec"><dt>Open</dt><dd>the verdict or the surprise</dd><dt>Body</dt><dd>what it is, what is good (shown working), what is not, who it is for</dd><dt>Proof</dt><dd>a before and after wipe, a timer, a measurement</dd><dt>Sponsored</dt><dd>the disclosure before any praise</dd></dl></div>
+    <div class="panel"><h3>Comparison</h3><dl class="spec"><dt>Open</dt><dd>both side by side and the question</dd><dt>Body</dt><dd>one test per beat, same framing and light, the winner said aloud</dd><dt>Colour</dt><dd><code>match.py</code>, so the light does not decide</dd><dt>End</dt><dd>the overall winner, and who should buy the other</dd></dl></div>
+    <div class="panel"><h3>Tutorial</h3><dl class="spec"><dt>Open</dt><dd>the result, then “how to … in N steps”</dd><dt>Per step</dt><dd>a chapter card or counter, the line, the action whole, its result</dd><dt>Screens</dt><dd>a phone mockup, or a callout on the button</dd><dt>End</dt><dd>the result again and the one mistake to avoid</dd></dl></div>
+    <div class="panel"><h3>Talking head</h3><dl class="spec"><dt>Open</dt><dd>the line that makes the point, never a greeting</dd><dt>Body</dt><dd>lines in order, cutaways on what is named, a punch-in on jump cuts</dd><dt>Angles</dt><dd>a second phone gives cuts somewhere to go</dd><dt>End</dt><dd>the payoff held a beat; the CTA as text</dd></dl></div>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section id="flow">
+  <div class="sec-head">
+    <span class="eyebrow">Reference</span>
+    <h2>Workflow</h2>
+    <p class="muted">Footage in, one finished video out. Every stage reads and writes one edit decision list (EDL), so the cut can happen in ffmpeg, Remotion, Blender or Chockstone’s editor.</p>
+  </div>
+  <ol class="flow">
+    <li><b>Shoot</b><span class="k">Hand over the filming guide; pick the content type’s recipe.</span></li>
+    <li><b>Organize</b><span class="k">One folder per video: <code>takes/</code> <code>broll/</code> <code>hooks/</code> <code>logos/</code> <code>music/</code> <code>work/</code> <code>renders/</code>. Conform everything into <code>work/</code>.</span></li>
+    <li><b>Look</b><span class="k"><code>probe.py</code> every file, <code>sheet.py</code> every clip. A take with no speech is footage (a demo, B-roll), not dead air.</span></li>
+    <li><b>Transcribe</b><span class="k">Word timings (WhisperX by default, local), numerals spelled out so they align, word ends fitted to the audio.</span></li>
+    <li><b>Plan</b><span class="k">Story beats, lines kept and dropped by number, the hook, B-roll and interludes, one best version.</span></li>
+    <li><b>Cut</b><span class="k">Write the EDL, <code>quiet.py snap</code>, <code>edl.py check</code>, <code>edl.py render --draft</code>.</span></li>
+    <li><b>Layer</b><span class="k">Captions, titles, logos, transitions, motion graphics, 3D.</span></li>
+    <li><b>Mix</b><span class="k">Voice clean-up, takes matched, music bed, master to -14 LUFS.</span></li>
+    <li><b>Render</b><span class="k">One master at CRF 15, BT.709, AAC 48 kHz.</span></li>
+    <li><b>Check and hand over</b><span class="k"><code>edl.py qa --sheet</code>, look at a frame after every change, then hand over one file with its caption text.</span></li>
+    <li><b>Learn</b><span class="k"><code>retention.py</code> lines the posted video’s retention graph up with its EDL: a drop at 0-3 s is the hook, at a cut the cut, a slow slide the length. It plans the next video; it never re-cuts this one.</span></li>
+  </ol>
+</section>
+
+<!-- EXAMPLE -->
+<section id="example">
+  <div class="sec-head">
+    <span class="eyebrow">Reference</span>
+    <h2>Worked example: a haul</h2>
+    <p class="muted">One request from footage to hand-over, as an illustration: two talking takes and six product clips. The files and lines are made up; the steps, tools and order are the skill’s.</p>
+  </div>
+  <div class="grid" style="--min: 340px">
+    <ol class="flow">
+      <li><b>The ask</b><span class="k">“Edit the clips in haul/ into one Reel with captions.” Claude makes the editorial calls from there.</span></li>
+      <li><b>Look</b><span class="k"><code>probe.py</code> notes t1 is HDR at a variable 60 fps, so <code>edl.py conform</code> makes everything 30 fps SDR. The sheets show broll/b4 has no speech: it is the packing footage, kept whole for an interlude.</span></li>
+      <li><b>Transcribe</b><span class="k">Word timings, with “6” spelled “six” so it aligns. The splitter prints 24 numbered lines.</span></li>
+      <li><b>Plan</b><span class="k">Three hooks written, one picked. Lines 3, 9 and 15 drop (a restart, a repeat, a fumble); the printout of dropped lines shows none names a product.</span></li>
+      <li><b>Cut</b><span class="k"><code>quiet.py snap</code> moves two edges out of words into pauses; <code>edl.py check</code> passes; a draft render.</span></li>
+      <li><b>Layer</b><span class="k">A <code>ListCounter</code> counts to six as items land; phrase captions, moved off the face by <code>place.py</code>.</span></li>
+      <li><b>Mix</b><span class="k">Takes matched within 1 dB, the bed 15-20 dB under the voice, -14 LUFS.</span></li>
+      <li><b>Check</b><span class="k"><code>edl.py qa</code> errors on a street address at 0:07, the label on a box. <code>redact.py</code> blurs it and qa passes on the re-render. <code>cover.py</code> picks the cover.</span></li>
+      <li><b>Hand over</b><span class="k">One video, its cover and the caption text to paste. The person watches it and posts it.</span></li>
+    </ol>
+    <div class="codebox"><pre><code>{
+  "story": "six things from this week, each with a verdict",
+  "keep": [0, 1, 2, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14,
+           16, 17, 18, 19, 20, 21, 22, 23],
+  "hold": [12],
+  "hooks": [
+    {"id": "A", "text": "six things I got this week", "open_line": 0},
+    {"id": "B", "text": "the one I'd buy again", "open_line": 21},
+    {"id": "C", "text": "under-the-radar finds", "open_line": 4}
+  ],
+  "best": "B",
+  "best_why": "opens on the favourite, then the list runs in order",
+  "cutaways": [{"line": 4, "clip": "broll/b1.mp4", "word": "lamp"}],
+  "interludes": [{"after_line": 12, "clip": "broll/b4.mp4"}],
+  "cta": "all six are on my page",
+  "music": "music/bed.wav"
+}</code></pre>
+      <p class="muted" style="font-size:0.88rem;margin-top:8px">The plan holds decisions only, lines by number and clips by name. Code turns it into the EDL and does every bit of timing.</p></div>
+  </div>
+</section>
+
+<!-- COMMANDS -->
+<section id="commands">
+  <div class="sec-head">
+    <span class="eyebrow">Reference</span>
+    <h2>Commands</h2>
+    <p class="muted">Python 3.10+ standard library plus ffmpeg 7 or newer. Each script has <code>--help</code>. The skill lives in <code>~/.claude/playbook/skills/video-edit</code>.</p>
+  </div>
+  <div class="grid" style="--min: 340px">
+    <div class="codebox"><pre><code># look
+python3 scripts/probe.py takes/*.mov --levels
+python3 scripts/sheet.py takes/t1.mov work/t1.jpg --every 2
+
+# intake: HDR to SDR, constant fps, rotation baked
+python3 scripts/edl.py conform takes/*.mov -o work/
+
+# cut
+python3 scripts/quiet.py snap work/edit.json -o work/edit.json
+python3 scripts/edl.py check work/edit.json
+python3 scripts/edl.py render work/edit.json work/draft.mp4 --draft
+
+# captions, placed off faces
+python3 scripts/edl.py words work/edit.json -o work/timeline.words.json
+python3 scripts/captions.py work/timeline.words.json -f json --fps 30 -o work/caps.json
+~/.cache/video-edit/faces work/draft.mp4 3 30 &gt; work/faces.json
+python3 scripts/place.py work/faces.json work/caps.json -o work/caps.placed.json
+
+# master and check
+python3 scripts/edl.py render work/edit.json renders/cut.mp4
+python3 scripts/master.py mix renders/cut.mp4 renders/final.mp4 --music music/bed.wav
+python3 scripts/edl.py qa work/edit.json renders/final.mp4 --sheet work/qa.jpg</code></pre></div>
+    <div class="codebox"><pre><code>{
+  "fps": 30, "size": [1080, 1920],
+  "sources": {
+    "t1": {"path": "work/t1.mp4", "words": "work/t1.words.json"},
+    "b1": "work/jar.mp4",
+    "ti": "work/title.mov"
+  },
+  "segments": [
+    {"src": "t1", "in": 0.05, "out": 2.2},
+    {"src": "b1", "in": 0.5, "out": 3.5, "gain_db": -12,
+     "transition": {"type": "fade", "frames": 16}},
+    {"src": "t1", "in": 2.9, "out": 7.98}
+  ],
+  "cutaways": [
+    {"src": "ti", "in": 0, "out": 2, "at": 1, "fade": 0}
+  ]
+}</code></pre>
+      <p class="muted" style="font-size:0.88rem;margin-top:8px">An EDL. Times are seconds in each source; <code>edl.py</code> rounds them to frames. A transparent cutaway (a ProRes 4444 title) lays over the shot instead of replacing it.</p></div>
+  </div>
+  <div class="codebox"><pre><code># two phones, matched
+python3 scripts/sync.py takes/main.mov takes/phone2.mov
+python3 scripts/match.py takes/main.mov takes/phone2.mov --region 0.3,0.2,0.7,0.5
+
+# repair at intake
+python3 scripts/edl.py conform takes/*.mov -o work/ --stabilize --denoise light
+python3 scripts/reframe.py wide.mp4 work/tall.mp4
+python3 scripts/quiet.py tone takes/t1.mov work/room.wav
+
+# long video to short clips
+python3 scripts/clips.py work/talk.words.json
+python3 scripts/clips.py work/talk.words.json --pick 3,7 --src talk.mp4 -o clips/
+
+# a typed title and its key sounds
+python3 scripts/typeon.py "best loaf yet" -o work/title
+
+# before handing over
+python3 scripts/redact.py renders/final.mp4 renders/final.redacted.mp4 --dry-run --sheet work/regions.jpg &gt; work/regions.json
+python3 scripts/redact.py renders/final.mp4 renders/final.redacted.mp4 --sure-only
+python3 scripts/cover.py work/graded.mp4 renders/cover.jpg --json work/cover.json --top 6 work/covers.jpg
+
+# after posting
+python3 scripts/retention.py work/edit.json curve.csv</code></pre></div>
+</section>
+
+<!-- COMPLIANCE -->
+<section id="compliance">
+  <div class="sec-head">
+    <span class="eyebrow">Step 9 · Deliver</span>
+    <h2>Compliance</h2>
+    <p class="muted">US rules as of 2026-10, from <code>references/compliance.md</code>. Not legal advice: a brand’s contract or a project’s own rules can ask for more.</p>
+  </div>
+  <div class="grid" style="--min: 300px">
+    <div class="panel"><h3>Sponsored or gifted</h3>
+      <p>When a brand paid, gifted, discounted or reimbursed the creator, or a link earns, the video itself discloses: on screen, aloud, or both. At the start, and again before a mid-video endorsement. A caption or bio alone is not enough.</p>
+      <dl class="spec wrap"><dt>works</dt><dd>“Brand paid me to try this”, “Brand sent me this for free”, “Sponsored by Brand”, “#ad” at the start</dd>
+        <dt>fails alone</dt><dd>“gifted” without who gave it, #ambassador, #partner, #collab, “sp”, a thank-you</dd></dl>
+      <p class="muted">Platform labels (paid partnership, TikTok’s disclosure toggle) add to this; whether to use them is the creator’s call.</p>
+    </div>
+    <div class="panel"><h3>Affiliate links</h3>
+      <ul class="plain"><li>Disclose in the video and next to the link: “I earn from this link”.</li>
+        <li>Amazon Associates: no prices burned into the video, no link shortener that hides amazon.com, no paid boosting, no product images taken from listings.</li>
+        <li>The Associates statement goes wherever the links are; a bio or link page counts.</li></ul>
+    </div>
+    <div class="panel"><h3>Synthetic media labels</h3>
+      <p>Realistic people, places or events made by a generative model need the platform’s label: TikTok’s content label, Meta’s info label, YouTube’s altered or synthetic setting. Editing real footage (cuts, grade, captions, noise reduction, background blur) needs none. A synthetic voice over real footage is borderline: disclose it.</p>
+    </div>
+    <div class="panel"><h3>Originality and privacy</h3>
+      <p>No other app’s watermark: platforms rank reposts lower, and <code>edl.py qa</code> fails on one. Nothing that identifies a private person: shipping labels, addresses, phone numbers, emails, tracking numbers, a bystander’s face, a screen full of notifications.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TROUBLESHOOTING -->
+<section id="trouble">
+  <div class="sec-head">
+    <span class="eyebrow">Reference</span>
+    <h2>Troubleshooting</h2>
+    <p class="muted">When a render looks or sounds wrong. Each fix happens in code, followed by a re-render.</p>
+  </div>
+  <h3>Picture</h3>
+  <div class="scroll"><table><thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead><tbody>
+<tr><td>Colours shift or look washed out in the app</td><td>Untagged file, or BT.601 read as BT.709</td><td><code>edl.py conform</code>; check tags with <code>probe.py</code>; render.md on hand-written ffmpeg</td></tr>
+<tr><td>iPhone footage looks grey and flat or blown out</td><td>HDR (HLG, Dolby Vision) left unconverted</td><td><code>edl.py conform</code> tone-maps to SDR at intake</td></tr>
+<tr><td>Stutter or doubled frames</td><td>Variable frame rate source</td><td><code>edl.py conform</code> (constant 30 fps)</td></tr>
+<tr><td>Sideways or upside-down clip</td><td>Rotation flag not baked</td><td><code>edl.py conform</code></td></tr>
+<tr><td>Jumpy slow push</td><td>ffmpeg <code>zoompan</code> moves whole pixels</td><td>Zoom in Remotion</td></tr>
+<tr><td>Blurry after a punch-in or reframe</td><td>Upscaling a 1080p crop</td><td>Shoot 4K; keep zooms at 1.15 or less</td></tr>
+<tr><td>Shaky handheld</td><td></td><td><code>conform --stabilize</code> (crops 4%)</td></tr>
+<tr><td>Grainy low light</td><td></td><td><code>conform --denoise light</code>, or <code>strong</code> (slower)</td></tr>
+<tr><td>Text on a face</td><td>Captions placed before a re-cut</td><td>Re-run faces on the final cut, then <code>place.py</code></td></tr>
+<tr><td>A flash frame at a cut</td><td>An off-by-one <code>out</code></td><td><code>edl.py check</code>; the qa sheet shows the frame after each cut</td></tr>
+<tr><td>Wobbly green screen edge</td><td></td><td>Use the matte (<code>matte.swift --person</code>) and <code>GreenScreen</code>, not a chroma key</td></tr>
+</tbody></table></div>
+  <h3>Sound</h3>
+  <div class="scroll"><table><thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead><tbody>
+<tr><td>A word clipped at a cut</td><td>Edge in speech</td><td><code>quiet.py snap</code>; never move an edge inward</td></tr>
+<tr><td>A click at a cut</td><td>No fade at the edge</td><td><code>edl.py render</code> fades every edge 8 ms; check hand-made graphs</td></tr>
+<tr><td>Hollow, phasey voice</td><td>Two mics summed</td><td>Use the louder channel alone (<code>"channel": N</code>)</td></tr>
+<tr><td>Sudden silence under B-roll</td><td>Muted segment with nothing under it</td><td><code>room_tone</code> at the EDL's top level</td></tr>
+<tr><td>Voice jumps in level between takes</td><td>Takes recorded differently</td><td><code>gain_db</code> per segment, within 1 dB</td></tr>
+<tr><td>Music swamps the voice</td><td>Bed too loud</td><td><code>master.py mix --gap-db</code> lower; 15-20 dB under speech</td></tr>
+<tr><td>Breathing, pumping level</td><td>Dynamic <code>loudnorm</code> on a mix</td><td>One gain and a limiter (<code>master.py</code>)</td></tr>
+<tr><td>Audio drifts out of sync</td><td>VFR source, or audio cut without picture</td><td>Conform; Auphonic's <code>silence_cutter</code> off</td></tr>
+<tr><td>A whoosh lands early</td><td>Effect aligned by its start</td><td><code>"align": "peak"</code></td></tr>
+</tbody></table></div>
+  <h3>Pipeline</h3>
+  <div class="scroll"><table><thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead><tbody>
+<tr><td>A line vanished from the edit</td><td>Wrong index; or a silent take</td><td>Print lines from the splitter; check takes for speech (plan.md)</td></tr>
+<tr><td>Numbers mistimed in captions</td><td>Aligner cannot time digits</td><td>Spell numerals out before aligning</td></tr>
+<tr><td><code>faces</code>, <code>ocr</code> or <code>matte</code> will not build</td><td>No Xcode command line tools</td><td><code>xcode-select --install</code>; off macOS use MediaPipe</td></tr>
+<tr><td>Remotion <code>Cannot find module brand.json</code></td><td>JSON imports off</td><td><code>"resolveJsonModule": true</code> in tsconfig</td></tr>
+<tr><td>Platform refuses an upload</td><td>Over its bitrate or size limit</td><td>Re-render at CRF 17-18; never resize (render.md)</td></tr>
+<tr><td><code>redact.py</code> covers packaging or a cap</td><td>OCR read print it could not make out (<code>unsure</code>)</td><td><code>--sheet</code>, then <code>--sure-only</code> or edit the JSON</td></tr>
+<tr><td><code>edl.py qa</code> says "possibly ... (OCR unsure)"</td><td>The same: garbage read from print</td><td>Look at the frame; no fix when it is print</td></tr>
+</tbody></table></div>
+  <h3 id="glossary" style="scroll-margin-top:64px">Glossary</h3>
+  <div class="panel"><dl class="spec wrap"><dt>A-roll / B-roll</dt><dd>the main talking footage / footage shown over or between it.</dd><dt>Cutaway</dt><dd>a B-roll shot laid over the voice; picture changes, sound runs on.</dd><dt>Interlude</dt><dd>a clip played whole between two lines, with its own sound, while the voice pauses.</dd><dt>J cut / L cut</dt><dd>the next shot's sound starts before its picture / a shot's sound runs on under the next picture.</dd><dt>Jump cut</dt><dd>a cut inside one take that makes the subject jump; a punch-in hides it.</dd><dt>Punch-in</dt><dd>a small zoom (1.1-1.15) on the second half of a jump cut.</dd><dt>Speed ramp</dt><dd>footage that changes speed inside one shot.</dd><dt>Room tone</dt><dd>the sound of the empty room, laid under gaps so they never go dead silent.</dd><dt>EDL</dt><dd>edit decision list, the JSON every stage here reads (<code>edl.py --help</code>).</dd><dt>Conform</dt><dd>converting every source to one frame rate, colour space and orientation at intake.</dd><dt>Handles</dt><dd>spare source frames past a cut, which a dissolve uses.</dd><dt>Matte</dt><dd>a mask of the person, for text behind them, background blur and green screen.</dd><dt>Safe zone</dt><dd>the part of the frame no app button or caption covers.</dd><dt>LUFS / dBTP</dt><dd>loudness as heard / the highest true peak; masters sit at -14 LUFS, -1 dBTP.</dd><dt>CRF</dt><dd>x264's quality setting; lower is better, 15 is near-transparent.</dd><dt>BT.709</dt><dd>the HD colour standard every master is tagged with.</dd><dt>Waveform / vectorscope</dt><dd>graphs of brightness by position / of colour, for matching shots.</dd><dt>Hook</dt><dd>the first line and text, which decide whether a viewer stays.</dd><dt>CTA</dt><dd>the call to action at the end ("full routine on my page").</dd><dt>Cover</dt><dd>the frame shown on the profile grid; cropped to 3:4 or 4:5 there.</dd></dl></div>
+</section>
+
+<!-- CHOCKSTONE -->
+<section id="chockstone">
+  <div class="sec-head">
+    <span class="eyebrow">Chockstone posts</span>
+    <h2>Editing a Chockstone post</h2>
+    <p class="muted">The phone records, cuts and renders; Claude changes the edit list through Chockstone’s MCP tools. Claude never calls <code>post_submit</code>, <code>post_schedule</code> or any publish tool. The person posts.</p>
+  </div>
+  <div class="row mono" style="font-size:0.85rem">
+    <span class="tag">edit_get</span>→<span class="tag">edit_change (base_rev)</span>→<span class="tag">edit_render</span>→<span class="tag">edit_frames</span>→<span class="muted">wrong turn:</span><span class="tag">edit_versions</span><span class="tag">undo</span>
+  </div>
+  <div class="scroll"><table>
+    <thead><tr><th>To do this</th><th>Change</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Drop a line</td><td><code>split</code> then <code>remove</code>, or <code>trim</code></td><td>Split points from caption ends, moved out into the pause</td></tr>
+      <tr><td>Cut dead air</td><td><code>cut_pauses</code></td><td>Defaults <code>min_ms</code> 1500, <code>keep_ms</code> 400; never under 1000 / 300</td></tr>
+      <tr><td>Better take</td><td><code>swap_take</code></td><td>Its captions follow</td></tr>
+      <tr><td>Reorder</td><td><code>move</code></td><td>0 is first</td></tr>
+      <tr><td>Jump inside one take</td><td><code>punch_in</code> 1.1-1.15</td><td>Face stays in frame</td></tr>
+      <tr><td>Match takes</td><td><code>look</code>, <code>volume</code></td><td>Exposure and warmth within ±0.15</td></tr>
+      <tr><td>Hook, CTA, title</td><td><code>text_add</code></td><td>x, y are the centre as frame fractions; size 24-160</td></tr>
+      <tr><td>Logo, product shot</td><td><code>image_add</code></td><td>Width 0.2-0.3, on the word that names it</td></tr>
+      <tr><td>Captions</td><td><code>captions</code></td><td>Style clean, bold, boxed or pop; <code>y: null</code>; font from the brand kit</td></tr>
+      <tr><td>Fix caption words</td><td><code>caption_edit</code></td><td>Brand names spelled the brand’s way</td></tr>
+      <tr><td>Music</td><td><code>music</code> with <code>duck: true</code></td><td>The person’s own licensed file</td></tr>
+      <tr><td>Clean the voice</td><td><code>sound {clean: true}</code></td><td>Cleans to -16 LUFS; fade out 300-800 ms</td></tr>
+      <tr><td>Cover</td><td><code>cover</code></td><td>A frame with face and product</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- BLENDER -->
+<section id="blender">
+  <div class="sec-head">
+    <span class="eyebrow">Step 6 · Layer</span>
+    <h2>Blender 3D titles</h2>
+    <p class="muted"><code>blender_title.py</code> renders a title or logo reveal headless as transparent PNGs (about 0.3 s a frame on Apple Silicon, tested on Blender 5.2.3 LTS). Use Remotion for flat text; Blender is for depth, glass and metal.</p>
+  </div>
+  <div class="grid" style="--min: 340px">
+    <div class="scroll"><table>
+      <thead><tr><th>Flag</th><th>Default</th><th>Does</th></tr></thead>
+      <tbody>
+        <tr><td><code>--text</code> / <code>--svg</code></td><td></td><td>The words, or a logo file (keeps its own colours)</td></tr>
+        <tr><td><code>--font</code></td><td></td><td>A static .ttf or .otf</td></tr>
+        <tr><td><code>--look</code></td><td class="mono">flat</td><td>flat: exact colour; lit: shaded 3D with a sun</td></tr>
+        <tr><td><code>--color</code></td><td class="mono">FFFFFF</td><td>Text colour, or one colour for a whole logo</td></tr>
+        <tr><td><code>--height</code></td><td class="num mono">0.07</td><td>Size as a fraction of frame height (0.04-0.09)</td></tr>
+        <tr><td><code>--y</code></td><td class="num mono">0.2</td><td>Centre, fraction of height from the top</td></tr>
+        <tr><td><code>--max-width</code></td><td class="num mono">0.71</td><td>Widest it may run (the shared safe box)</td></tr>
+        <tr><td><code>--extrude</code> <code>--bevel</code></td><td class="num mono">0</td><td>Depth; try 0.01 and 0.002 with lit</td></tr>
+        <tr><td><code>--rise</code></td><td class="num mono">0.015</td><td>Drift up while fading in (0 = dead still)</td></tr>
+        <tr><td><code>--turn</code></td><td class="num mono">0</td><td>Degrees it turns while fading in</td></tr>
+        <tr><td><code>--frames</code></td><td class="num mono">60</td><td>Length: in over 0.3 s, hold, out over 0.17 s</td></tr>
+      </tbody>
+    </table></div>
+    <div class="codebox"><pre><code>BLENDER=/Applications/Blender.app/Contents/MacOS/Blender
+"$BLENDER" -b --factory-startup --python-exit-code 1 \
+  -P scripts/blender_title.py -- \
+  --text "Sunday Reset" --font fonts/Anton-Regular.ttf \
+  --look lit --extrude 0.01 --bevel 0.002 \
+  --out work/title/f_####
+
+# PNGs to ProRes 4444 with alpha, BT.709
+ffmpeg -framerate 30 -i work/title/f_%04d.png \
+  -vf scale=out_color_matrix=bt709:out_range=tv,format=yuva444p10le,setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=tv \
+  -c:v prores_ks -profile:v 4444 -alpha_bits 16 -vendor apl0 work/title.mov</code></pre>
+      <p class="muted" style="font-size:0.88rem;margin-top:8px">Then add <code>title.mov</code> to the EDL as a cutaway with <code>"fade": 0</code>, or play it in Remotion with <code>&lt;OffthreadVideo transparent /&gt;</code>.</p></div>
+  </div>
+</section>
+
+<!-- LICENCES -->
+<section id="licences">
+  <div class="sec-head">
+    <span class="eyebrow">Reference</span>
+    <h2>Licences</h2>
+    <p class="muted">What matters when the pipeline ships inside a product like Chockstone. Checked 2026-10; recheck before shipping.</p>
+  </div>
+  <div class="scroll"><table>
+    <thead><tr><th>Tool</th><th>Licence</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>ffmpeg</td><td>LGPL; GPL with libx264</td><td>Call the user’s ffmpeg as a separate program</td></tr>
+      <tr><td>Remotion</td><td>Remotion License</td><td>Free up to 3 people; a company licence above that</td></tr>
+      <tr><td>WhisperX</td><td>BSD-2</td><td>Model weights carry their own terms</td></tr>
+      <tr><td>Blender</td><td>GPL-3.0</td><td>Scripts that use it are GPL; renders belong to whoever made them</td></tr>
+      <tr><td>Fonts above</td><td>SIL OFL</td><td>Free for video, apps and products</td></tr>
+      <tr><td>SAM 2 · BiRefNet · MediaPipe</td><td>Apache-2.0 · MIT · Apache-2.0</td><td>Person mattes; RobustVideoMatting is GPL-3.0</td></tr>
+      <tr><td>Music</td><td>Per plan</td><td>Epidemic Sound or another licence; yt-dlp audio only as a beat reference</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+</main>
+</div>
+
+<script>
+(function () {
+  var pause = document.getElementById('motion');
+  pause.addEventListener('click', function () {
+    var on = document.body.classList.toggle('paused');
+    pause.setAttribute('aria-pressed', on ? 'true' : 'false');
+    pause.textContent = on ? 'Play motion' : 'Pause motion';
+    syncVideos();
+  });
+  // set-piece clips play only while on screen, and not when motion is paused or reduced
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var shown = new Set();
+  var videos = document.querySelectorAll('video[data-fx]');
+  function syncVideos() {
+    var stop = still.matches || document.body.classList.contains('paused');
+    videos.forEach(function (v) {
+      if (!stop && shown.has(v)) { var p = v.play(); if (p) p.catch(function () {}); } else { v.pause(); }
+    });
+  }
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) shown.add(e.target); else shown.delete(e.target); });
+      syncVideos();
+    }, { rootMargin: '100px' });
+    videos.forEach(function (v) { io.observe(v); });
+  } else {
+    videos.forEach(function (v) { shown.add(v); });
+    syncVideos();
+  }
+  if (still.addEventListener) still.addEventListener('change', syncVideos);
+  var figs = document.getElementById('zone-figs');
+  document.querySelectorAll('button[data-zone]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var on = b.getAttribute('aria-pressed') !== 'true';
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      figs.classList.toggle('hide-' + b.dataset.zone, !on);
+    });
+  });
+  document.querySelectorAll('.codebox pre').forEach(function (pre) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'btn copy'; b.textContent = 'Copy';
+    b.addEventListener('click', function () {
+      var text = pre.innerText;
+      var done = function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1500); };
+      var select = function () { var r = document.createRange(); r.selectNodeContents(pre); var s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Selected'; };
+      try { navigator.clipboard.writeText(text).then(done, select); } catch (e) { select(); }
+    });
+    pre.parentNode.appendChild(b);
+  });
+})();
+</script>

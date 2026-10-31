@@ -1,0 +1,23 @@
+{
+	"fonts": {
+		"sans": "\"TikTok Sans\", \"SF Pro Display\", -apple-system, Arial, sans-serif",
+		"serif": "\"Playfair Display\", \"Bodoni 72\", Didot, Georgia, serif",
+		"display": "\"Bodoni Moda\", \"Bodoni 72\", Didot, \"Playfair Display\", serif",
+		"caption": "\"TikTok Sans\", \"SF Pro Display\", -apple-system, Arial, sans-serif"
+	},
+	"colors": {
+		"text": "#FFFFFF",
+		"accent": "#6C4DF6",
+		"highlight": "#FFD84D",
+		"paper": "#F4EEE3",
+		"ink": "#1B1B1B",
+		"shadow": "0 1px 3px rgba(0, 0, 0, 0.35), 0 2px 14px rgba(0, 0, 0, 0.45)"
+	},
+	"caption": {
+		"size": 76,
+		"weight": 700,
+		"lowercase": false
+	},
+	"handle": "",
+	"logo": ""
+}
