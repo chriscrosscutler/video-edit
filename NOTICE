@@ -1,0 +1,10 @@
+video-edit
+Copyright 2026 Chockstone Labs LLC
+https://chockstonelabs.com
+
+scripts/blender_title.py is licensed under GPL-3.0-or-later (LICENSES/GPL-3.0-or-later.txt),
+because Blender treats scripts that use its Python API as part of Blender. Everything else is
+licensed under the Apache License 2.0 (LICENSE).
+
+The people and scenes in the demo images and clips under guide/img and .github/readme were
+generated with ChatGPT.

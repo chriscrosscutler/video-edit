@@ -17,6 +17,7 @@
   <img alt="Claude Code skill" src="https://img.shields.io/badge/Claude_Code-skill-4A47F5?style=flat-square&labelColor=0A1A8C">
   <img alt="Python 3.10 or newer" src="https://img.shields.io/badge/Python-3.10%2B-4A47F5?style=flat-square&labelColor=0A1A8C">
   <img alt="ffmpeg 7 or newer" src="https://img.shields.io/badge/ffmpeg-7%2B-4A47F5?style=flat-square&labelColor=0A1A8C">
+  <img alt="Apache 2.0 license" src="https://img.shields.io/badge/license-Apache_2.0-4A47F5?style=flat-square&labelColor=0A1A8C">
   <img alt="Vision tools on macOS" src="https://img.shields.io/badge/vision_tools-macOS-7A2CF0?style=flat-square&labelColor=0A1A8C">
 </p>
 
@@ -31,7 +32,8 @@ those picks into frame-exact cuts through one edit decision list, so a cut never
 
 ## What it makes
 
-These clips come from the field guide in [`guide/`](guide).
+These clips come from the field guide in [`guide/`](guide). The people and scenes in them were
+generated with ChatGPT.
 
 <table>
   <tr>
@@ -169,6 +171,13 @@ python3 tests/test_vision.py
 
 The Blender and Swift tests skip when those tools are missing. To read the field guide, open
 `guide/index.html` in a browser from this folder so the `img/` paths resolve.
+
+## License
+
+[Apache 2.0](LICENSE), copyright 2026 Chockstone Labs LLC, except `scripts/blender_title.py`,
+which is [GPL-3.0-or-later](LICENSES/GPL-3.0-or-later.txt) because Blender treats scripts that
+use its Python API as part of Blender. A copy or fork keeps the [NOTICE](NOTICE) file. The
+license does not cover the Chockstone Labs name or logo.
 
 <br>
 
