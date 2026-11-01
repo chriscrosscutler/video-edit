@@ -1,0 +1,10 @@
+{
+  "name": "video-edit",
+  "description": "Footage in, one finished video out: plans the story, cuts in the pauses between words, captions, grades, mixes to -14 LUFS, renders and checks the file. Runs locally with no API keys.",
+  "version": "1.1.0",
+  "author": { "name": "Chockstone Labs", "url": "https://chockstonelabs.com" },
+  "homepage": "https://github.com/chriscrosscutler/video-edit",
+  "repository": "https://github.com/chriscrosscutler/video-edit",
+  "keywords": ["video", "editing", "ffmpeg", "captions", "reels", "remotion"],
+  "skills": ["./"]
+}

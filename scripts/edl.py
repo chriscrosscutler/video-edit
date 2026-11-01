@@ -17,12 +17,12 @@ Usage:
   edl.py qa EDL.json OUT.mp4 [--sheet S.jpg] [--lufs -14 | --no-loudness] [--tp -1]
             [--scopes S.png] [--no-ocr] [--allow TEXT ...]
       delivery checks: H.264 yuv420p at the EDL size and fps, BT.709 tags, frame count, A/V sync,
-      AAC 48 kHz stereo, moov first, loudness; --sheet writes a frame after every change. Notes
-      on clipped or crushed levels and shots that don't match their neighbours (--scopes writes a
-      waveform and vectorscope per change). On macOS, reads the text on screen every half second
-      (ocr.swift): another app's watermark or personal details (an address, phone, email, a
-      tracking number) are errors; a price, a URL or a barcode are warnings. --allow skips text
-      containing TEXT (the brand's own site).
+      AAC 48 kHz stereo, moov first, loudness, a pop at any cut (a warning); --sheet writes a frame
+      after every change. Notes on clipped or crushed levels and shots that don't match their
+      neighbours (--scopes writes a waveform and vectorscope per change). On macOS, reads the text
+      on screen every half second (ocr.swift): another app's watermark or personal details (an
+      address, phone, email, a tracking number) are errors; a price, a URL or a barcode are
+      warnings. --allow skips text containing TEXT (the brand's own site).
 
 EDL shape (times in seconds in the source; paths relative to the EDL file):
   {"fps": 30, "size": [1080, 1920],
@@ -65,6 +65,7 @@ on the cut, a hit on the word) instead of its start.
 """
 import argparse
 import json
+from array import array
 import platform
 import re
 import subprocess
@@ -683,6 +684,32 @@ def levels(out: Path, rows: list[dict], plan: Plan) -> list[str]:
     return notes
 
 
+def clicks(out: Path, cuts: list[float]) -> list[str]:
+    """Cuts where the sound jumps: a step between two samples within 3 ms of the cut, far steeper
+    than any in the 100 ms around it. That is a pop the ear hears even when the picture is clean;
+    a hard cut through a held note, or a segment with no afade, makes one."""
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", str(out), "-vn", "-ac", "1", "-ar", "48000",
+                          "-f", "s16le", "-"], capture_output=True, check=True).stdout
+    pcm = array("h")
+    pcm.frombytes(raw[: len(raw) // 2 * 2])
+    if sys.byteorder == "big":
+        pcm.byteswap()
+    sr, near, wide = 48000, 144, 4800  # 3 ms, 100 ms
+    notes = []
+    for t in cuts:
+        c = round(t * sr)
+        if c - wide < 1 or c + wide > len(pcm):
+            continue
+        jump = max(abs(pcm[i] - pcm[i - 1]) for i in range(c - near, c + near))
+        steps = sorted(abs(pcm[i] - pcm[i - 1]) for i in (*range(c - wide, c - 2 * near),
+                                                          *range(c + 2 * near, c + wide)))
+        usual = max(steps[int(len(steps) * 0.99)], 1)
+        if jump >= 1500 and jump >= 4 * usual:  # 1500 is -27 dBFS; a tone or noise reads near 1x
+            notes.append(f"{t:.2f}s: the sound pops at the cut ({jump / usual:.0f}x the usual step): "
+                         "give the segment an afade, or snap the cut into quiet (quiet.py)")
+    return notes
+
+
 def scopes(out: Path, picks: list[int], dst: Path) -> None:
     """Picture, waveform and vectorscope side by side for each picked frame, one row each."""
     sel = "+".join(f"eq(n\\,{f})" for f in picks)
@@ -754,6 +781,8 @@ def qa(plan: Plan, out: Path, sheet: Path | None, lufs: float | None, tp: float,
     if ocr and sys.platform == "darwin":
         e, w = screen_text(out, fps, allow or [])
         errs, warns = errs + e, warns + w
+    if a is not None:
+        warns += clicks(out, [r["start"] / fps for r in rows[1:]])
     for n in levels(out, rows, plan):
         print(f"note  {n}")
     for w in warns:

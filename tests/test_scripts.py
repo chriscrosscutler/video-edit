@@ -220,6 +220,36 @@ class Scripts(unittest.TestCase):
         self.assertEqual(p.returncode, 1)
         self.assertIn("moov", p.stdout)
 
+    def test_qa_hears_a_pop_at_a_cut(self):
+        # A held tone whose sign flips at 1 s: a hard cut with no fade. AAC smears the step but keeps it.
+        ff("-f", "lavfi", "-i", "aevalsrc='if(lt(t,1),0.3,-0.3)*cos(2*PI*220*t)':s=48000:d=2",
+           "-c:a", "aac", self.d / "pop.m4a")
+        ff("-f", "lavfi", "-i", "aevalsrc='0.3*cos(2*PI*220*t)':s=48000:d=2", "-c:a", "aac", self.d / "held.m4a")
+        sys.path.insert(0, str(S))
+        import edl as E
+        self.assertEqual(len(E.clicks(self.d / "pop.m4a", [1.0, 1.5])), 1)
+        self.assertEqual(E.clicks(self.d / "held.m4a", [1.0, 1.5]), [])
+        out = self.render("plain", self.edl)  # every segment has the default 8 ms afade
+        self.assertEqual(E.clicks(out, [r["start"] / 30 for r in E.Plan(self.d / "plain.json").timeline()[1:]]), [])
+
+    def test_lines_marks_retakes(self):
+        rows, t = [], 0.0
+        for line, pause in (("So the fir-", 0.6), ("So the first thing you do is wash your face.", 0.15),
+                            ("Um, I use warm water, uh, every night.", 0.15),
+                            ("I use warm water every single night.", 0.8), ("Then the mask goes on", 0.15)):
+            for w in line.split():
+                rows.append({"word": w, "start": round(t, 2), "end": round(t + 0.3, 2)})
+                t += 0.35
+            t += pause
+        lines = json.loads(py("lines.py", self.write("takes.words.json", rows), "--json").stdout)
+        self.assertEqual([ln["text"].split()[0] for ln in lines], ["So", "So", "Um,", "I", "Then"])  # . and pauses
+        self.assertEqual(lines[0]["marks"], [{"kind": "retake", "of": 1}])
+        self.assertEqual(lines[2]["marks"], [{"kind": "filler", "count": 2}, {"kind": "repeat", "of": 3}])
+        self.assertEqual(lines[1]["marks"] + lines[3]["marks"] + lines[4]["marks"], [])
+        self.assertEqual(lines[4]["words"], [len(rows) - 5, len(rows) - 1])
+        text = py("lines.py", self.d / "takes.words.json").stdout
+        self.assertIn("0: 0.00-1.00 So the fir-   [retake 1]", text)
+
     def test_alpha_cutaway(self):
         base = self.render("plain", self.edl)
         titled = self.render("titled", dict(self.edl, cutaways=[{"src": "ti", "in": 0, "out": 2, "at": 1, "fade": 0}]))

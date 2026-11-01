@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "video-edit",
+  "owner": { "name": "Chockstone Labs", "url": "https://chockstonelabs.com" },
+  "description": "Install video-edit as a Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "video-edit",
+      "source": "./",
+      "description": "Footage in, one finished video out: plans the story, cuts in the pauses between words, captions, grades, mixes to -14 LUFS, renders and checks the file. Runs locally with no API keys.",
+      "category": "productivity",
+      "keywords": ["video", "editing", "ffmpeg", "captions", "reels", "remotion"]
+    }
+  ]
+}

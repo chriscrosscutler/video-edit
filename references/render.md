@@ -66,6 +66,7 @@ On macOS it also reads the text on screen every half second (`ocr.swift`; `--no-
 | `a price on screen` | warn | Fine unless the project forbids prices (Amazon affiliates: never) |
 | `a URL on screen` | warn | Check it is the person's or the brand's; never a link shortener |
 | `an app name on screen` | warn | Fine when it is the point ("TikTok made me buy it"); a leftover watermark is not |
+| `the sound pops at the cut` | warn | A step in the audio within 3 ms of a cut, at least 4 times steeper than any in the 100 ms around it: give the segment an `afade` (0.008 s is the default; 0 removes it) or move the cut into quiet with `quiet.py snap`. Listen at that second before posting |
 | `highlights clip` / `shadows crush` | note | Over 20% of a segment's frames at the limits: grade.md |
 | `segment N is brighter (darker, warmer, cooler) than the shot before` | note | Two takes that should match do not: `match.py` |
 | `possibly ... (OCR unsure): look at the frame` | warn | Vision read it at low confidence: usually upside-down or curved print. Look; a real address still needs `redact.py` |

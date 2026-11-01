@@ -36,7 +36,13 @@ One folder per video. Raw files are never edited or renamed after intake.
   work/                cache: conformed files, transcripts, levels, faces, draft renders (disposable)
   renders/             the final master and its report
   plan.json  edl.json  the editorial decisions, then the timed cut
+  notes.md             what was asked, decided and left open, session by session
 ```
+
+- A session on a video starts by reading its `notes.md` and ends by adding to it: the request in
+  the person's words, each decision with its reason (the hook picked and why, a line kept that
+  `lines.py` marked), and what is left open. The next session starts from the notes, not from
+  re-watching the footage.
 
 - Cache every slow step in `work/` keyed by its inputs (file mtime, settings); a re-run redoes only
   what changed. Keep a `--force` to rebuild all.
@@ -63,9 +69,14 @@ The plan names lines by index, so indices must come from the same splitter the c
 that breaks at long pauses as well as punctuation numbers differently from the transcript's
 periods, and a wrong index that still exists passes validation.
 
-- Print the numbered lines (`index: start-end text`) from the splitter itself and plan from that
-  printout. After any transcript edit (adding a period to split a run-on), print again: indices
-  shift.
+- Print the numbered lines with `lines.py work/<take>.words.json` (`index: start-end text`) and
+  plan from that printout. Code that turns the plan into an EDL reads `lines.py --json`, which
+  gives each line's word range, so the plan and the cut count the same way. After any transcript
+  edit (adding a period to split a run-on), print again: indices shift.
+- Its marks are where to look first. `retake N`: a false start that line N begins again; drop it.
+  `repeat N`: the same words said twice; keep the better read, usually the later. `filler`: um
+  and uh, found only when the transcriber kept them (captions.md); cut the ones at a line's start
+  or end, and leave ones mid-sentence where a cut would jump the picture.
 - After writing the plan, print the text of every dropped line and read it. A line naming a
   sponsor or the product must never drop silently; make code refuse it.
 - When a pause splits a line in the middle of a demonstration, hold both halves so the pause plays.

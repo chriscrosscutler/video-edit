@@ -46,10 +46,10 @@ to a cloud service needs their OK; default to local tools. Paid tools and stock 
 | Step | Do | Read |
 |---|---|---|
 | 0 Shoot | Give the person the filming guide; pick the content type's recipe | references/plan.md, cookbook.md |
-| 1 Organize | One folder per video: `takes/`, `broll/`, `hooks/`, `logos/`, `music/`, `work/` (cache), `renders/`. `edl.py conform` into `work/`. | references/plan.md |
+| 1 Organize | One folder per video: `takes/`, `broll/`, `hooks/`, `logos/`, `music/`, `work/` (cache), `renders/`. `edl.py conform` into `work/`. Read the folder's `notes.md` first; add to it before ending | references/plan.md |
 | 2 Look | `probe.py --levels`, `sheet.py` per clip; note silent takes and the louder mic | references/plan.md |
 | 3 Transcribe | Word timings (WhisperX or another aligner), numerals spelled out, fitted to audio | references/captions.md |
-| 4 Plan | Story beats, lines kept and dropped by index, hook, B-roll and interludes, one best variant | references/plan.md |
+| 4 Plan | `lines.py` numbers the lines and marks retakes; story beats, lines kept and dropped by index, hook, B-roll and interludes, one best variant | references/plan.md |
 | 5 Cut | Write the EDL; `quiet.py snap`; `edl.py check`; `edl.py render --draft`. Split edits, speed, two cameras, reframing, clips from long videos | references/cut.md |
 | 6 Layer | Captions, titles, logos, transitions, motion graphics, set pieces, 3D | references/captions.md, transitions.md, motion.md, looks.md, blender.md |
 | 7 Grade and mix | Match takes, one look; voice clean-up, music bed, master | references/grade.md, audio.md |
@@ -66,8 +66,9 @@ Something looks or sounds wrong, or a term is unclear: references/troubleshootin
 `scripts/`, Python 3.10+ standard library plus ffmpeg 7+; `--help` on each gives flags and examples.
 The `.swift` tools (faces, matte, ocr, track, cover) use Apple Vision and build on first use (macOS).
 
-- Look: `probe.py`, `sheet.py`. Cut: `quiet.py` (quiet, snap, room tone), `edl.py` (conform, check,
-  words, render, qa), `sync.py` (two cameras), `reframe.py` (16:9 to 9:16), `clips.py` (long to short).
+- Look: `probe.py`, `sheet.py`. Plan: `lines.py` (numbered lines, retakes, fillers). Cut: `quiet.py`
+  (quiet, snap, room tone), `edl.py` (conform, check, words, render, qa), `sync.py` (two cameras),
+  `reframe.py` (16:9 to 9:16), `clips.py` (long to short).
 - Layer: `captions.py`, `place.py` (off faces), `typeon.py` (typed title and key sounds),
   `blender_title.py`, `templates/remotion/` (captions with highlights, Looks, Layouts, `brand.json`).
 - Grade and mix: `match.py`, `master.py`. Deliver: `redact.py` (privacy blur), `cover.py`.

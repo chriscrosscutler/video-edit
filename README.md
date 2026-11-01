@@ -9,6 +9,7 @@
   <a href="#install"><b>Install</b></a>&nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="#what-it-makes"><b>What it makes</b></a>&nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="#how-an-edit-runs"><b>How an edit runs</b></a>&nbsp;&nbsp;·&nbsp;&nbsp;
+  <a href="#compared-with-other-video-skills"><b>Compared</b></a>&nbsp;&nbsp;·&nbsp;&nbsp;
   <a href="https://chockstonelabs.com/?utm_source=github&utm_medium=readme&utm_campaign=video-edit"><b>Chockstone Labs</b></a>
 </p>
 
@@ -64,15 +65,15 @@ Six looks, one per video, each a single ffmpeg filter chain:
    speech, so a silent demo plays as footage instead of being cut as dead air.
 2. **Transcribe.** An aligner times every word against the audio, with numerals spelled out
    first because aligners cannot time digits.
-3. **Plan.** Claude keeps and drops lines by index, picks the hook, and places B-roll and
-   interludes.
+3. **Plan.** `lines.py` numbers the lines and marks false starts and repeated takes.
+   Claude keeps and drops lines by index, picks the hook, and places B-roll and interludes.
 4. **Cut.** `quiet.py snap` moves each cut into measured quiet, outward and never inward.
    `edl.py check` reports pacing before anything renders.
 5. **Layer and mix.** Captions stay in the safe zone and off faces (`place.py`), takes are
    matched, music sits 15 to 20 dB under speech, and the master lands at -14 LUFS and -1 dBTP.
 6. **Render and check.** One render at CRF 15 or better, then `edl.py qa` checks format, frame
-   count, sync and loudness, saves a frame after every change, and on macOS reads the text on
-   screen for personal details.
+   count, sync and loudness, listens for a pop at every cut, saves a frame after every change,
+   and on macOS reads the text on screen for personal details.
 
 Every stage reads and writes the same JSON file, so stages swap freely: cut in ffmpeg, then
 layer in Remotion or Blender.
@@ -89,12 +90,22 @@ layer in Remotion or Blender.
 
 ## Install
 
+In Claude Code, as a plugin:
+
+```text
+/plugin install video-edit --marketplace chriscrosscutler/video-edit
+```
+
+Or clone it into the skills folder:
+
 ```bash
 git clone https://github.com/chriscrosscutler/video-edit ~/.claude/skills/video-edit
 ```
 
-Then ask Claude Code for an edit in plain words, for example "cut these three takes into a
-40-second Reel with captions". The skill loads on its own.
+Then ask for an edit in plain words, for example "cut these three takes into a 40-second Reel
+with captions". The skill loads on its own. Claude Code before 2.1.275 installs the plugin in two
+lines: `/plugin marketplace add chriscrosscutler/video-edit`, then
+`/plugin install video-edit@video-edit`.
 
 You need:
 
@@ -103,6 +114,31 @@ You need:
   `matte`, `cover`). They build on first use into `~/.cache/video-edit/`.
 - Node for the Remotion templates, and Blender 5.2 LTS for `blender_title.py`
   ([references/blender.md](references/blender.md)).
+
+## Compared with other video skills
+
+Checked November 1, 2026. [video-use](https://github.com/browser-use/video-use) does the same job
+from the same starting point, a folder of raw takes:
+
+| | video-edit | video-use |
+|---|---|---|
+| Transcribes with | A local aligner: WhisperX, mlx-whisper or parakeet-mlx | ElevenLabs Scribe, with an API key |
+| Before the cut | Picks the lines and the hook itself and renders one file | Proposes a strategy and waits for your OK |
+| Checks the render for | A pop at any cut, frame count, sync, BT.709 tags, -14 LUFS, personal details on screen | Visual jumps, pops and hidden subtitles at each cut |
+| Remembers past sessions in | `notes.md` in the video's folder | `project.md` |
+
+video-edit keeps captions off faces, sets text behind the subject and pins labels to moving
+objects, all with Apple Vision on the Mac. Its compliance pass covers ad disclosure and music
+licences. Footage and voices stay on the machine unless the person agrees to a cloud tool.
+
+video-use is better at telling speakers apart and marking laughter and applause, which Scribe
+returns with the words, and it runs under Codex and other agents as well as Claude Code. It has
+30,000 stars.
+
+Two popular skills do other jobs. [claude-code-video-toolkit](https://github.com/digitalsamba/claude-code-video-toolkit)
+makes videos from a script, generating the voiceover and pictures on a cloud GPU.
+[Remotion's skills](https://github.com/remotion-dev/skills) teach Claude to write Remotion code;
+they pair with the Remotion templates here.
 
 ## Edit Chockstone posts
 
@@ -119,6 +155,7 @@ a word. The phone renders the result. See [references/chockstone.md](references/
 | [`SKILL.md`](SKILL.md) | The rules every edit follows, loaded on each use |
 | [`references/`](references) | One file per stage (plan, cut, captions, audio, grade, motion, render, compliance), read when a task needs it |
 | [`scripts/`](scripts) | Python (standard library only) and Swift tools; each prints its flags with `--help` |
+| [`.claude-plugin/`](.claude-plugin) | The plugin and marketplace manifests |
 | [`templates/remotion/`](templates/remotion) | Caption, look and layout components plus `brand.json` |
 | [`tests/`](tests) | `test_scripts.py` (needs ffmpeg) and `test_vision.py` (macOS, Apple Vision) |
 | [`guide/`](guide) | The illustrated field guide to every effect and look, with its demo clips |
