@@ -8,10 +8,15 @@ renders; its server only stores and checks the edit list. You change that list t
 ## Loop
 
 1. `edit_get {post_id}`: the edit list (clips cut from takes, with ids and in/out ms), its `rev`,
-   length, captions as SRT, each network's checks with a ready-made fix, and render status.
+   length, captions as SRT, `lines` (what's said, numbered from 1 in timeline order, from the
+   words the phone heard), `silent_takes` (takes with no speech), each network's checks with a
+   ready-made fix, and render status. `words: true` adds each line's words with their times.
    `edit` null means no cut yet: the phone makes the first cut when the person opens the editor.
-2. Plan as in references/plan.md from the SRT: keep and drop lines by caption and clip id. Every
-   time you send comes from `edit_get` (clip in/out, caption start/end), never a guess.
+2. Plan as in references/plan.md from `lines`: keep and drop by line number. The server works out
+   every cut time and puts it in the pauses, the same rule as cut.md "Snap, check, draft". Empty
+   `lines` means the phone hasn't reported its takes yet (an older app, or iOS before 26): plan from
+   the SRT, and every time you send comes from `edit_get` (clip in/out, caption start/end), never a
+   guess.
 3. `edit_change {post_id, base_rev, changes}`: 1-50 changes, applied in order, all or nothing.
    Always pass `base_rev`. `EDIT_CONFLICT` means the phone saved meanwhile: `edit_get` again and
    redo the changes on the new rev.
@@ -30,9 +35,13 @@ finished video.
 
 | Skill rule | Change | Notes |
 |---|---|---|
-| Drop a line | `split` at the line's quiet edges, then `remove`; or `trim` an end | Split points from caption ends, moved out into the pause, never into a word |
+| Drop a line | `drop_lines {lines: [n, ...]}` | Split out and removed in the pauses around each run of lines; an end line trims the clip |
+| Keep only some lines | `trim {clip, from_line, to_line}` | Either end alone trims one side |
+| Split between lines | `split {clip, after_line}` or `{clip, before_word}` (a word index from `words: true`) | Cuts in the middle of the pause |
+| A typed time | `trim`/`split`/`swap_take` in ms | Moved outward into the nearest pause within 0.6 s; the result's `notes` say where. `snap: false` keeps it as typed |
 | Cut dead air | `cut_pauses` with its defaults (`min_ms` 1500, `keep_ms` 400) | Keeps breaths; never `min_ms` under 1000 or `keep_ms` under 300 |
 | Better take of a line | `swap_take` | Its captions follow |
+| B-roll | A take from `silent_takes` | Footage with no voice: cut to it between lines |
 | Order the story | `move` | 0 is first |
 | Jump inside one take | `punch_in` 1.1-1.15 on the second part | Face stays in frame; check the sheet |
 | Match takes | `look` per clip (exposure, warmth within ±0.15); `volume` per clip | Whole-edit `look` for the grade |
